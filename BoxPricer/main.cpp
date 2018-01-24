@@ -4,7 +4,7 @@
 #include <iostream>
 
 //Use default values or enter in program
-#define DEBUG 1
+#define DEBUG 0
 
 //Order or boxes
 class Order
@@ -193,7 +193,7 @@ void Order::getCustomerPrice()
 	std::cout << "Price of order is currently " << customerCost << std::endl;
 	std::cout << "Do you want to use custom pricing? y for yes, other for no: " << std::endl;
 	std::cin >> custom;
-	if (custom == "y")
+	if ((custom == "y")||(custom == "Y"))
 	{
 		std::cout << "Enter price per box: ";
 		std::cin >> pricePerBox;
@@ -223,9 +223,12 @@ void Order::doOrderInfo()
 int main()
 {
 	Order a;
+	int b;
 	a.doBlankSize("Blanksize.txt");
 	a.doStockSheet("StockBoard.txt");
 	a.doOrderInfo();
 	a.getCustomerPrice();
+	//To pause before close
+	std::cin >> b;
 	return 0;
 }

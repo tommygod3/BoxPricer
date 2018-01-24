@@ -1,6 +1,8 @@
 **/Debug/
+**/Release/
 **/.vs/
 **/ipch/
 *.db
 **/x64/
+**/x86/
 *.xlsx
