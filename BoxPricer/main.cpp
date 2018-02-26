@@ -1,10 +1,9 @@
-#include "stdafx.h"
 #include <string>
 #include <fstream>
 #include <iostream>
 
 //Use default values or enter in program
-#define DEBUG 0
+#define DEBUG 1
 
 //Order or boxes
 class Order
@@ -37,11 +36,12 @@ public:
 	void doBlankSize(std::string filename);
 	void doStockSheet(std::string filename);
 	void getCustomerPrice();
-	void doOrderInfo();
+	void showOrderInfo();
 };
 
 Order::Order()
 {
+	//Makes an order with preset default values if debugging
 	if (DEBUG)
 	{
 		flute = "B";
@@ -53,12 +53,14 @@ Order::Order()
 		boxHeight = 229;
 		quantity = 400;
 	}
+	//If not debugging get values
 	else
 	{
 		getBoxValues();
 	}
 }
 
+//Function to get order input from console
 void Order::getBoxValues()
 {
 	std::cout << "Enter flute: ";
@@ -96,43 +98,57 @@ void Order::getBoxValues()
 
 void Order::doBlankSize(std::string filename)
 {
+	//Open file
 	std::ifstream blankIn;
 	blankIn.open(filename);
+	//Set up parsing string 'checker'
 	std::string checker;
+	//Set up arithmetic variables to read into
 	double paramCL, paramCW, paramCH, paramCAd, paramCA1, paramCA2;
 	double paramDL, paramDW, paramDH, paramDAd, paramDA1, paramDA2;
-	
+	//Loop through file until we find the desired style in the
+	//blanksize file, or we reach the end and it is not found
 	while ((checker != style)&&(!blankIn.eof()))
 	{
+		//Discards previous line (or first line of just headings)
 		getline(blankIn, checker);
+		//Put first word (style) of the line into parser for comparison
 		blankIn >> checker;
 	}
+	//Return with error if our desired style is not in the file
 	if (blankIn.eof())
 	{
 		std::cout << "Style not found, check blanksize file." << std::endl;
 		return;
 	}
+	//Read in the rest of the values to their appropriate variables
 	blankIn >> paramCL >> paramCW >> paramCH >> paramCAd >> paramCA1 >> paramCA2 >> paramDL >> paramDW >> paramDH >> paramDAd >> paramDA1 >> paramDA2;
+	//Set up variables for blanksizes
 	allowance[0] = -1;
 	allowance[1] = -1;
-	while (!blankIn.eof())
+	//Go through flute values relevant to this style until we find the appropriate one
+	while (blankIn.peek() != '\n')
 	{
 		blankIn >> checker;
+		//This is what we want so assign allowances that follow it
 		if (checker == flute)
 		{
 			blankIn >> allowance[0] >> allowance[1];
 			break;
 		}
+		//Skip to next flute
 		else
 		{
 			blankIn >> checker >> checker;
 		}
 	}
+	//We did't find the flute we want so return with error
 	if ((allowance[0]<0) || (allowance[1]<0))
 	{
 		std::cout << "Error calculating allowances, check "<< filename << std::endl;
 		return;
 	}
+	//Do calculation here and set values
 	boxChop = (paramCL*boxLength) + (paramCW*boxWidth) + (paramCH*boxHeight) + paramCAd + (paramCA1*allowance[0]) + (paramCA2*allowance[1]);
 	boxDecal = (paramDL*boxLength) + (paramDW*boxWidth) + (paramDH*boxHeight) + paramDAd + (paramDA1*allowance[0]) + (paramDA2*allowance[1]);
 }
@@ -140,21 +156,28 @@ void Order::doBlankSize(std::string filename)
 
 void Order::doStockSheet(std::string filename)
 {
+	//Initialise variable to -1 so can detect if not found
 	sheetChop = -1;
+	//Set up file to read in from
 	std::ifstream stockIn;
 	stockIn.open(filename);
+	//Set up parsing variables
 	std::string strChecker1;
 	std::string strChecker2;
 	int intChecker1;
 	int intChecker2;
+	//Set up comparison variable
 	int intCompare = 0;
+	//Get rid of first line with headings
 	getline(stockIn, strChecker1);
+	//Loop through file until we find matching flute, pweight and pquality
 	while (!stockIn.eof())
 	{
 		stockIn >> strChecker1 >> intChecker1 >> strChecker2;
 		if ((strChecker1 == flute) && (intChecker1 == paperWeight) && (strChecker2 == paperQuality))
 		{
 			stockIn >> intChecker1 >> intChecker2;
+			//Currently checks for biggest chop and decal and stores those
 			if ((intChecker1 > intCompare)&&(intChecker1>boxChop)&&(intChecker2>boxDecal))
 			{
 				intCompare = intChecker1;
@@ -162,11 +185,13 @@ void Order::doStockSheet(std::string filename)
 				sheetDecal = intChecker2;
 				stockIn >> sheetPrice;
 			}
+			//If not successful throw away rest of line
 			else
 			{
 				getline(stockIn, strChecker1);
 			}
 		}
+		//If not successful throw away rest of line
 		else
 		{
 			getline(stockIn, strChecker1);
@@ -181,8 +206,10 @@ void Order::doStockSheet(std::string filename)
 
 void Order::getCustomerPrice()
 {
+	//Works out cost and price of order, displays through console
+	//Temporary default pricing but also asks if want to customise these numbers
 	std::string custom;
-	//Temporary values for example
+	//Temporary pricing values for example
 	double pricePerBox = 0.05;
 	double priceOntop = 10;
 	int boxPerSheet = (sheetChop / boxChop);
@@ -206,8 +233,10 @@ void Order::getCustomerPrice()
 	}
 }
 
-void Order::doOrderInfo()
+void Order::showOrderInfo()
 {
+	//Displays order properties through console
+	//Work out square meter of box
 	double sqMeterBox = ((boxChop*boxDecal) / 1000000);
 	if ((style == "0200") || (style == "0201"))
 	{
@@ -223,12 +252,9 @@ void Order::doOrderInfo()
 int main()
 {
 	Order a;
-	int b;
 	a.doBlankSize("Blanksize.txt");
 	a.doStockSheet("StockBoard.txt");
-	a.doOrderInfo();
+	a.showOrderInfo();
 	a.getCustomerPrice();
-	//To pause before close
-	std::cin >> b;
 	return 0;
 }
