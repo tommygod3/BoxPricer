@@ -252,8 +252,8 @@ void Order::showOrderInfo()
 int main()
 {
 	Order a;
-	a.doBlankSize("Blanksize.txt");
-	a.doStockSheet("StockBoard.txt");
+	a.doBlankSize("../data/Blanksize.txt");
+	a.doStockSheet("../data/StockBoard.txt");
 	a.showOrderInfo();
 	a.getCustomerPrice();
 	return 0;

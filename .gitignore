@@ -1,8 +1,7 @@
-**/Debug/
-**/Release/
-**/.vs/
-**/ipch/
-*.db
-*.user
-**/x64/
+bin/*
+build/*
+.VSFiles/*
+!.VSFiles/BoxPricer.sln
+!.VSFiles/BoxPricer.vcxproj
+!.VSFiles/BoxPricer.vcxproj.filters
 *.xlsx
