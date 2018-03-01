@@ -1,5 +1,3 @@
-bin/*
-build/*
 .VSFiles/*
 !.VSFiles/BoxPricer.sln
 !.VSFiles/BoxPricer.vcxproj
