@@ -18,7 +18,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	$(CC) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	$(RM) -r $(TARGET)
+	$(RM) -r $(TARGET) $(BUILDDIR)/*
 
 #Tests
 tester:
