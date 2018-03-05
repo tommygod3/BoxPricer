@@ -4,50 +4,57 @@
 class Order
 {
 private:
-	//Order inputted
+	//Inputs:
     //What kind of box
-	std::string flute;
-	unsigned int paperWeight;
-	std::string paperQuality;
-	std::string style;
+	std::string flute = "";
+	unsigned int paperWeight = 0;
+	std::string paperQuality = "";
+	std::string style = "";
     //How large the box is
-	double boxLength;
-	double boxWidth;
-	double boxHeight;
+	double boxLength = 0;
+	double boxWidth = 0;
+	double boxHeight = 0;
     //How many of them to order
-	unsigned int quantity;
-    //Used for calculations
+	int quantity = -1;
+    //Pricing info
+    double pricePerBox = 0.05;
+    double priceOnTop = 100.00;
+    //Calculated:
 	unsigned int allowance[2];
 	double sheetChop;
 	double sheetDecal;
 	double sheetPrice;
-    //Pricing information
-    double pricePerBox = 0.05;
-    double priceOnTop = 100.00;
-public:
-	//To be worked out and displayed
+	//Outputs:
 	double orderCost;
 	double customerPrice;
 	double boxChop;
 	double boxDecal;
 public: 
 	Order();
-	//Functions to set order values used by buttons
+	//Functions to set order values
     void setFlute(std::string desiredFlute);
-    void setPaperWeight(unsigned int desiredWeight);
+    void setPaperWeight(std::string desiredWeight);
     void setPaperQuality(std::string desiredQuality);
     void setStyle(std::string desiredStyle);
-    void setBoxLength(double desiredLength);
-    void setBoxWidth(double desiredWidth);
-    void setBoxHeight(double desiredHeight);
-    void setQuantity(unsigned int desiredQuantity);
-    //Functions to calculate
+    void setBoxLength(std::string desiredLength);
+    void setBoxWidth(std::string desiredWidth);
+    void setBoxHeight(std::string desiredHeight);
+    void setQuantity(std::string desiredQuantity);
+    void setPricePerBox(std::string desiredPricePer);
+    void setPriceOnTop(std::string desiredPriceOnTop);
+    //Functions to get output values
+    double getOrderCost();
+    double getCustomerPrice();
+    double getBoxChop();
+    double getBoxDecal();
+    //Functions that calculate and produce information
+    void doAllCalculations();
+    std::string checkSet();
     void doBlankSize(std::string filename);
 	void doStockSheet(std::string filename);
     void doPricing();
     std::string generateInformation();
-    void doAllCalculations();
-    //Display info to console
+    //Functionality if using console
     void consoleDisplay();
     void consoleInput();
 };

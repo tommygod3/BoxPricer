@@ -1,72 +1,297 @@
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 #include "order.h"
 
 //Use default values or enter in program
-#define DEBUG 1
-//Enter in program with console or buttons
-#define UI 0
+#define AUTO 0
+//interact with program using console or buttons
+#define GUI 0
 
 Order::Order()
 {
-	//Makes an order with preset default values if debugging
-	if (DEBUG)
+	//Uses console input if not using GUI
+	if (!GUI)
 	{
-		flute = "B";
-		paperWeight = 125;
-		paperQuality = "KT";
-		style = "0200";
-		boxLength = 305;
-		boxWidth = 229;
-		boxHeight = 229;
-		quantity = 400;
-	}
-	//If not debugging get values
-	else if (!UI)
-	{
-		consoleInput();
+		//Use default values that work
+		if (AUTO)
+		{
+			flute = "B";
+			paperWeight = 125;
+			paperQuality = "KT";
+			style = "0200";
+			boxLength = 305;
+			boxWidth = 229;
+			boxHeight = 229;
+			quantity = 400;
+		}
+		//Use console to input:
+		else
+		{
+			consoleInput();
+		}
+		//Process and return console output:
+		//Check values in are set
+		if (checkSet() != "Passed")
+		{
+			std::cout<<checkSet()<<std::endl;
+		}
+		else
+		{
+			//Check file checking works and return if not
+			try 
+			{
+				doAllCalculations();
+			}
+			catch(std::invalid_argument &e)
+			{
+				//Tel user in console what error is
+				std::cout<<e.what()<<std::endl;
+				return;
+			}
+			//Display output in console
+			consoleDisplay();
+		}
 	}
 }
 
 void Order::setFlute(std::string desiredFlute)
 {
+	if (desiredFlute.size()>2)
+	{
+		throw std::invalid_argument("Flute selection invalid: too many characters");
+	}
+	for (unsigned int i=0; i<desiredFlute.size(); i++)
+	{
+		if (!isalpha(desiredFlute.at(i)))
+		{
+			throw std::invalid_argument("Flute selection invalid: non-alphabetical");
+		}
+		desiredFlute.at(i)=toupper(desiredFlute.at(i));
+	}
     flute = desiredFlute;
 }
 
-void Order::setPaperWeight(unsigned int desiredWeight)
+void Order::setPaperWeight(std::string desiredWeight)
 {
-    paperWeight = desiredWeight;
+	for (unsigned int i=0; i<desiredWeight.size();i++)
+	{
+		if (!isdigit(desiredWeight.at(i)))
+		{
+			throw std::invalid_argument("Paper Weight selection invalid: not an integer");
+		}
+	}
+	if (std::stoi(desiredWeight)<0)
+	{
+		throw std::invalid_argument("Paper Weight selection invalid: can't be negative");
+	}
+    paperWeight = std::stoul(desiredWeight);
 }
 
 void Order::setPaperQuality(std::string desiredQuality)
 {
+	for (unsigned int i= 0; i<desiredQuality.size();i++)
+	{
+		if (!isalpha(desiredQuality.at(i)))
+		{
+			throw std::invalid_argument("Paper Quality selection invalid: non-alphabetical");
+		}
+		desiredQuality.at(i) = toupper(desiredQuality.at(i));
+	}
     paperQuality = desiredQuality;
 }
     
 void Order::setStyle(std::string desiredStyle)
 {
+	for (unsigned int i = 0; i<desiredStyle.size();i++)
+	{
+		if (!isdigit(desiredStyle.at(i)))
+		{
+			throw std::invalid_argument("Style selection invalid: not an integer");
+		}
+	}
+	if (std::stoi(desiredStyle)<0)
+	{
+		throw std::invalid_argument("Style selection invalid: can't be negative");
+	}
     style = desiredStyle;
 }
 
-void Order::setBoxLength(double desiredLength)
+void Order::setBoxLength(std::string desiredLength)
 {
-    boxLength = desiredLength;
+	for (unsigned int i=0; i<desiredLength.size();i++)
+	{
+		if (!isdigit(desiredLength.at(i)))
+		{
+			throw std::invalid_argument("Box Length selection invalid: not an integer");
+		}
+	}
+	if (std::stoi(desiredLength)<0)
+	{
+		throw std::invalid_argument("Box Length selection invalid: can't be negative");
+	}
+    boxLength = std::stod(desiredLength);
 }
 
-void Order::setBoxWidth(double desiredWidth)
+void Order::setBoxWidth(std::string desiredWidth)
 {
-    boxWidth = desiredWidth;
+	for (unsigned int i=0; i<desiredWidth.size();i++)
+	{
+		if (!isdigit(desiredWidth.at(i)))
+		{
+			throw std::invalid_argument("Box Width selection invalid: not an integer");
+		}
+	}
+	if (std::stoi(desiredWidth)<0)
+	{
+		throw std::invalid_argument("Box Width selection invalid: can't be negative");
+	}
+    boxWidth = std::stod(desiredWidth);
 }
 
-void Order::setBoxHeight(double desiredHeight)
+void Order::setBoxHeight(std::string desiredHeight)
 {
-    boxHeight = desiredHeight;
+	for (unsigned int i=0; i<desiredHeight.size();i++)
+	{
+		if (!isdigit(desiredHeight.at(i)))
+		{
+			throw std::invalid_argument("Box Height selection invalid: not an integer");
+		}
+	}
+	if (std::stoi(desiredHeight)<0)
+	{
+		throw std::invalid_argument("Box Height selection invalid: can't be negative");
+	}
+    boxHeight = std::stod(desiredHeight);
 }
 
-void Order::setQuantity(unsigned int desiredQuantity)
+void Order::setQuantity(std::string desiredQuantity)
 {
-    quantity = desiredQuantity;
+	for (unsigned int i=0; i<desiredQuantity.size();i++)
+	{
+		if (!isdigit(desiredQuantity.at(i)))
+		{
+			throw std::invalid_argument("Quantity selection invalid: not an integer");
+		}
+	}
+	if (std::stoi(desiredQuantity)<0)
+	{
+		throw std::invalid_argument("Quantity selection invalid: can't be negative");
+	}
+    quantity = std::stoi(desiredQuantity);
+}
+
+void Order::setPricePerBox(std::string desiredPricePer)
+{
+	unsigned int dotCount = 0;
+	for (unsigned int i=0; i<desiredPricePer.size();i++)
+	{
+		if (!isdigit(desiredPricePer.at(i)))
+		{
+			if (desiredPricePer.at(i)!='.'|| dotCount>0)
+			{
+				throw std::invalid_argument("Price per box selection invalid: not a number");
+			}
+			else
+			{
+				dotCount++;
+			}
+		}
+	}
+	if (std::stoi(desiredPricePer)<0)
+	{
+		throw std::invalid_argument("Price per box selection invalid: can't be negative");
+	}
+	pricePerBox = std::stod(desiredPricePer);
+}
+
+void Order::setPriceOnTop(std::string desiredPriceOnTop)
+{
+	unsigned int dotCount = 0;
+	for (unsigned int i=0; i<desiredPriceOnTop.size();i++)
+	{
+		if (!isdigit(desiredPriceOnTop.at(i)))
+		{
+			if (desiredPriceOnTop.at(i)!='.'|| dotCount>0)
+			{
+				throw std::invalid_argument("Price on top selection invalid: not a number");
+			}
+			else
+			{
+				dotCount++;
+			}
+		}
+	}
+	if (std::stoi(desiredPriceOnTop)<0)
+	{
+		throw std::invalid_argument("Price on top selection invalid: can't be negative");
+	}
+	priceOnTop = std::stod(desiredPriceOnTop);
+}
+
+double Order::getOrderCost()
+{
+	return orderCost;
+}
+
+double Order::getCustomerPrice()
+{
+	return customerPrice;
+}
+
+double Order::getBoxChop()
+{
+	return boxChop;
+}
+
+double Order::getBoxDecal()
+{
+	return boxDecal;
+}
+
+void Order::doAllCalculations()
+{	
+	doBlankSize("../data/Blanksize.txt");
+	doStockSheet("../data/StockBoard.txt");
+	doPricing();
+}
+
+std::string Order::checkSet()
+{
+	if (flute == "")
+	{
+		return "Flute not set";
+	}
+	if (paperWeight == 0)
+	{
+		return "Paper Weight not set";
+	}
+	if (paperQuality == "")
+	{
+		return "Paper Quality not set";
+	}
+	if (style == "")
+	{
+		return "Style not set";
+	}
+	if (boxLength == 0)
+	{
+		return "Length not set";
+	}
+	if (boxWidth == 0)
+	{
+		return "Width not set";
+	}
+	if (boxHeight == 0)
+	{
+		return "Height not set";
+	}
+	if (quantity == -1)
+	{
+		return "Quantity not set";
+	}
+	return "Passed";
 }
 
 void Order::doBlankSize(std::string filename)
@@ -193,53 +418,165 @@ std::string Order::generateInformation()
     return info;
 }
 
-void Order::doAllCalculations()
-{
-    doBlankSize("../data/Blanksize.txt");
-	doStockSheet("../data/StockBoard.txt");
-    doPricing();
-}
-
 void Order::consoleDisplay()
 {
-    std::cout << "Chop: " << boxChop << std::endl;
-    std::cout << "Decal: " << boxDecal << std::endl;
-    std::cout << "Cost of order: " << orderCost << std::endl;
-    std::cout << "Price of order: " << customerPrice << std::endl;
+	std::cout<< "--------------------Calculated Values:--------------------"<<std::endl;
+    std::cout << "Chop: " << getBoxChop() << std::endl;
+    std::cout << "Decal: " << getBoxDecal() << std::endl;
+    std::cout << "Cost of order: " << getOrderCost() << std::endl;
+    std::cout << "Price of order: " << getCustomerPrice() << std::endl;
     std::cout << generateInformation() << std::endl;
 }
 
 void Order::consoleInput()
 {
-    std::cout << "Enter flute: ";
-	std::cin >> flute;
-	std::cout << std::endl;
+    std::cout << "Flute: ";
+	std::string fluteIn;
+	std::cin >> fluteIn;
+	try
+	{
+		setFlute(fluteIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
 
-	std::cout << "Enter Weight: ";
-	std::cin >> paperWeight;
-	std::cout << std::endl;
+	std::cout << "Weight: ";
+	std::string weightIn;
+	std::cin >> weightIn;
+	try
+	{
+		setPaperWeight(weightIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
 
-	std::cout << "Enter Quality: ";
-	std::cin >> paperQuality;
-	std::cout << std::endl;
+	std::cout << "Quality: ";
+	std::string qualityIn;
+	std::cin >> qualityIn;
+	try
+	{
+		setPaperQuality(qualityIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
 
-	std::cout << "Enter Style: ";
-	std::cin >> style;
-	std::cout << std::endl;
+	std::cout << "Style: ";
+	std::string styleIn;
+	std::cin >> styleIn;
+	try
+	{
+		setStyle(styleIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
+	
+	std::cout << "Length: ";
+	std::string lengthIn;
+	std::cin >> lengthIn;
+	try
+	{
+		setBoxLength(lengthIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
 
-	std::cout << "Enter Length: ";
-	std::cin >> boxLength;
-	std::cout << std::endl;
+	std::cout << "Width: ";
+	std::string widthIn;
+	std::cin >> widthIn;
+	try
+	{
+		setBoxWidth(widthIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
 
-	std::cout << "Enter Width: ";
-	std::cin >> boxWidth;
-	std::cout << std::endl;
+	std::cout << "Height: ";
+	std::string heightIn;
+	std::cin >> heightIn;
+	try
+	{
+		setBoxHeight(heightIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
 
-	std::cout << "Enter Height: ";
-	std::cin >> boxHeight;
-	std::cout << std::endl;
+	std::cout << "Quantity: ";
+	std::string quantityIn;
+	std::cin >> quantityIn;
+	try
+	{
+		setQuantity(quantityIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
 
-	std::cout << "Enter Quantity: ";
-	std::cin >> quantity;
-    std::cout << std::endl;
+	std::cout << "Price per box: ";
+	std::string pricePerIn;
+	std::cin >> pricePerIn;
+	try
+	{
+		setPricePerBox(pricePerIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
+
+	std::cout << "Price on top: ";
+	std::string priceOnTopIn;
+	std::cin >> priceOnTopIn;
+	try
+	{
+		setPriceOnTop(priceOnTopIn);
+	}
+	catch(std::invalid_argument &e)
+	{
+		std::cout<<e.what()<<std::endl;
+		std::cout<<"Restarting input"<<std::endl;
+		consoleInput();
+		return;
+	}
 }
