@@ -6,11 +6,15 @@ VSFiles/*
 !VSFiles/BoxPricer.vcxproj.filters
 # Ignore spreadsheet for working with
 *.xlsx
-#Ignore Qt files
+# Ignore user files
+*.user
+# Ignore Qt files
+*.cache
+*.stash
 *.moc
 moc_*.cpp
 moc_*.h
 qrc_*.cpp
 ui_*.h
-#Ignore user settings files
-*.user
+Makefile*
+*build-*

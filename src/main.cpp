@@ -1,7 +1,10 @@
-#include "order.h"
+#include "BPViewer.h"
+#include <QtWidgets/QApplication>
 
-int main()
+int main(int argc, char *argv[])
 {
-	BP::Order a;
-	return 0;
+	QApplication application(argc, argv);
+	BPViewer mainWindow;
+	mainWindow.show();
+	return application.exec();
 }
