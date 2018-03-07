@@ -353,6 +353,7 @@ namespace BP
 		std::cout << "Cost of order: " << getOrderCost() << std::endl;
 		std::cout << "Price of order: " << getCustomerPrice() << std::endl;
 		std::cout << generateInformation() << std::endl;
+		std::cout << "Press any key to close..." << std::endl;
 	}
 
 	void Order::consoleInput()

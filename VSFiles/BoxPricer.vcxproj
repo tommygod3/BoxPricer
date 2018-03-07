@@ -19,11 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\blanksize.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\order.cpp" />
+    <ClCompile Include="..\src\stockboard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\blanksize.h" />
     <ClInclude Include="..\include\order.h" />
+    <ClInclude Include="..\include\stockboard.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
