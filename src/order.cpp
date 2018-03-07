@@ -5,7 +5,7 @@
 #include "order.h"
 
 //Use default values or enter in program
-#define AUTO 0
+#define AUTO 1
 //interact with program using console or buttons
 #define GUI 0
 

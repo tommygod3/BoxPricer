@@ -1,5 +1,16 @@
-.VSFiles/*
-!.VSFiles/BoxPricer.sln
-!.VSFiles/BoxPricer.vcxproj
-!.VSFiles/BoxPricer.vcxproj.filters
+# Ignores generated Visual Studio files -
+# except solution and project files
+VSFiles/*
+!VSFiles/BoxPricer.sln
+!VSFiles/BoxPricer.vcxproj
+!VSFiles/BoxPricer.vcxproj.filters
+# Ignore spreadsheet for working with
 *.xlsx
+#Ignore Qt files
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+#Ignore user settings files
+*.user
