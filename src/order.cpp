@@ -9,7 +9,7 @@ namespace BP
 	//Use default values or enter in program
     #define AUTO 0
 	//Interact with program using console or buttons
-    #define GUI 0
+    #define GUI 1
 
 	Order::Order()
 	{
