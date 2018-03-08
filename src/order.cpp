@@ -7,9 +7,9 @@
 namespace BP
 {
 	//Use default values or enter in program
-	#define AUTO 1
+    #define AUTO 0
 	//Interact with program using console or buttons
-	#define GUI 0
+    #define GUI 0
 
 	Order::Order()
 	{
@@ -229,7 +229,7 @@ namespace BP
 		}
 		doBlankSize();
 		doStockSheet();
-		doPricing();
+        doPricing();
 	}
 
 	std::string Order::checkSet()
@@ -353,7 +353,6 @@ namespace BP
 		std::cout << "Cost of order: " << getOrderCost() << std::endl;
 		std::cout << "Price of order: " << getCustomerPrice() << std::endl;
 		std::cout << generateInformation() << std::endl;
-		std::cout << "Press any key to close..." << std::endl;
 	}
 
 	void Order::consoleInput()

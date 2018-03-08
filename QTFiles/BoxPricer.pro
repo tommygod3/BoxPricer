@@ -2,12 +2,13 @@ TARGET = BoxPricer
 DESTDIR = ../bin
 QT += core gui widgets
 CONFIG += debug
-DEFINES += _UNICODE WIN64 QT_DLL QT_WIDGETS_LIB
+CONFIG += c++11
+DEFINES += QT_DLL QT_WIDGETS_LIB #WIN64 #_UNICODE
 INCLUDEPATH += ../include \
     ./../QTFiles/GeneratedFiles
 DEPENDPATH += ../include
-MOC_DIR += GeneratedFiles
+MOC_DIR += ../QTFiles/GeneratedFiles
 OBJECTS_DIR += debug
-UI_DIR += GeneratedFiles
-RCC_DIR += GeneratedFiles
+UI_DIR += ../QTFiles/GeneratedFiles
+RCC_DIR += ../QTFiles/GeneratedFiles
 include(BoxPricer.pri)
