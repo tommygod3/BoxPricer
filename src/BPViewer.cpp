@@ -3,6 +3,7 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
+	this->setWindowState(Qt::WindowMaximized);
 
 	order = new BP::Order;
 
@@ -22,58 +23,207 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 
 void BPViewer::setFlute()
 {
-
+	//Get text from label
+	QString inString = ui.lineEditFlute->text();
+	//Set with converted QString
+	try
+	{
+		order->setFlute(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 
 void BPViewer::setPW()
 {
-
+	QString inString = ui.lineEditPW->text();
+	try
+	{
+		order->setPaperWeight(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::setPQ()
 {
-
+	QString inString = ui.lineEditPQ->text();
+	try
+	{
+		order->setPaperQuality(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::setStyle()
 {
-
+	QString inString = ui.lineEditStyle->text();
+	try
+	{
+		order->setStyle(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::setLength()
 {
-
+	QString inString = ui.lineEditLength->text();
+	try
+	{
+		order->setBoxLength(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::setWidth()
 {
-
+	QString inString = ui.lineEditWidth->text();
+	try
+	{
+		order->setBoxWidth(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::setHeight()
 {
-
+	QString inString = ui.lineEditHeight->text();
+	try
+	{
+		order->setBoxHeight(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::setQuantity()
 {
-
+	QString inString = ui.lineEditQuantity->text();
+	try
+	{
+		order->setQuantity(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::setPPB()
 {
-
+	QString inString = ui.lineEditPPB->text();
+	try
+	{
+		order->setPricePerBox(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::setPOT()
 {
-
+	QString inString = ui.lineEditPOT->text();
+	try
+	{
+		order->setPriceOnTop(inString.toStdString());
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+	}
 }
 
 void BPViewer::calculateValues()
 {
+	try
+	{
+		order->doAllCalculations();
+	}
+	catch (std::invalid_argument &e)
+	{
+		QString message = QString::fromStdString(e.what());
+		QMessageBox msg;
+		msg.setText("Error");
+		msg.setInformativeText(message);
+		msg.exec();
+		return;
+	}
+	//Set:
+	QString toString = QString::number(order->getBoxChop());
+	ui.lineReadChop->setText(toString);
 
+	toString = QString::number(order->getBoxDecal());
+	ui.lineReadDecal->setText(toString);
+
+	toString = QString::number(order->getOrderCost());
+	ui.lineReadCost->setText(toString);
+
+	toString = QString::number(order->getCustomerPrice());
+	ui.lineReadPrice->setText(toString);
+
+	toString = QString::fromStdString(order->generateInformation());
+	ui.textInfo->setText(toString);
 }
 	
 /*

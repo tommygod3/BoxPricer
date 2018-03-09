@@ -225,7 +225,7 @@ namespace BP
 	{	
 		if (checkSet()!="Passed")
 		{
-			throw std::invalid_argument("Error with inputted values - " + checkSet());
+			throw std::invalid_argument("Missing values: " + checkSet());
 		}
 		doBlankSize();
 		doStockSheet();
@@ -275,7 +275,7 @@ namespace BP
 		//Throws if inputs not found in file
 		if (blanksizes->getMatch(style,flute).first<0)
 		{
-			throw std::invalid_argument("Error with inputted values - no match found for Style and Flute in Blanksize file");
+			throw std::invalid_argument("Error with inputted values: no match found for Style and Flute in Blanksize file");
 		}
 		//Get location in data structure using style and flute
 		unsigned int indexNo = blanksizes->getMatch(style,flute).first;
@@ -311,7 +311,7 @@ namespace BP
 		double cPrice;
 		if (matches.size()==0)
 		{
-			throw std::invalid_argument("Error with inputted values - no match found for Flute, Paper Weight and Paper Quality in Stockboard file");
+			throw std::invalid_argument("Error with inputted values: no match found for Flute, Paper Weight and Paper Quality in Stockboard file");
 		}
 		for (unsigned int i = 0; i < matches.size(); i++)
 		{
