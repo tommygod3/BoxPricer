@@ -64,6 +64,10 @@ namespace BP
 		{
 			throw std::invalid_argument("Flute selection invalid: too many characters");
 		}
+		if (desiredFlute.size()==0)
+		{
+			throw std::invalid_argument("Flute selection invalid: entry is empty");
+		}
 		for (unsigned int i=0; i<desiredFlute.size(); i++)
 		{
 			if (!isalpha(desiredFlute.at(i)))
@@ -77,6 +81,10 @@ namespace BP
 
 	void Order::setPaperWeight(std::string desiredWeight)
 	{
+		if (desiredWeight.size() == 0)
+		{
+			throw std::invalid_argument("Paper Weight selection invalid: entry is empty");
+		}
 		for (unsigned int i=0; i<desiredWeight.size();i++)
 		{
 			if (!isdigit(desiredWeight.at(i)))
@@ -89,6 +97,10 @@ namespace BP
 
 	void Order::setPaperQuality(std::string desiredQuality)
 	{
+		if (desiredQuality.size() == 0)
+		{
+			throw std::invalid_argument("Paper Quality selection invalid: entry is empty");
+		}
 		for (unsigned int i= 0; i<desiredQuality.size();i++)
 		{
 			if (!isalpha(desiredQuality.at(i)))
@@ -102,6 +114,10 @@ namespace BP
 		
 	void Order::setStyle(std::string desiredStyle)
 	{
+		if (desiredStyle.size() == 0)
+		{
+			throw std::invalid_argument("Style selection invalid: entry is empty");
+		}
 		for (unsigned int i = 0; i<desiredStyle.size();i++)
 		{
 			if (!isdigit(desiredStyle.at(i)))
@@ -115,6 +131,10 @@ namespace BP
 
 	void Order::setBoxLength(std::string desiredLength)
 	{
+		if (desiredLength.size() == 0)
+		{
+			throw std::invalid_argument("Box Length selection invalid: entry is empty");
+		}
 		for (unsigned int i=0; i<desiredLength.size();i++)
 		{
 			if (!isdigit(desiredLength.at(i)))
@@ -122,11 +142,19 @@ namespace BP
 				throw std::invalid_argument("Box Length selection invalid: not an integer");
 			}
 		}
+		if (std::stod(desiredLength) <= 0)
+		{
+			throw std::invalid_argument("Box Length selection invalid: not a positive integer");
+		}
 		boxLength = std::stod(desiredLength);
 	}
 
 	void Order::setBoxWidth(std::string desiredWidth)
 	{
+		if (desiredWidth.size() == 0)
+		{
+			throw std::invalid_argument("Box Width selection invalid: entry is empty");
+		}
 		for (unsigned int i=0; i<desiredWidth.size();i++)
 		{
 			if (!isdigit(desiredWidth.at(i)))
@@ -134,11 +162,19 @@ namespace BP
 				throw std::invalid_argument("Box Width selection invalid: not an integer");
 			}
 		}
+		if (std::stod(desiredWidth) <= 0)
+		{
+			throw std::invalid_argument("Box Width selection invalid: not a positive integer");
+		}
 		boxWidth = std::stod(desiredWidth);
 	}
 
 	void Order::setBoxHeight(std::string desiredHeight)
 	{
+		if (desiredHeight.size() == 0)
+		{
+			throw std::invalid_argument("Box Height selection invalid: entry is empty");
+		}
 		for (unsigned int i=0; i<desiredHeight.size();i++)
 		{
 			if (!isdigit(desiredHeight.at(i)))
@@ -146,11 +182,19 @@ namespace BP
 				throw std::invalid_argument("Box Height selection invalid: not an integer");
 			}
 		}
+		if (std::stod(desiredHeight) <= 0)
+		{
+			throw std::invalid_argument("Box Height selection invalid: not a positive integer");
+		}
 		boxHeight = std::stod(desiredHeight);
 	}
 
 	void Order::setQuantity(std::string desiredQuantity)
 	{
+		if (desiredQuantity.size() == 0)
+		{
+			throw std::invalid_argument("Quantity selection invalid: entry is empty");
+		}
 		for (unsigned int i=0; i<desiredQuantity.size();i++)
 		{
 			if (!isdigit(desiredQuantity.at(i)))
@@ -163,6 +207,10 @@ namespace BP
 
 	void Order::setPricePerBox(std::string desiredPricePer)
 	{
+		if (desiredPricePer.size() == 0)
+		{
+			throw std::invalid_argument("Price per box selection invalid: entry is empty");
+		}
 		unsigned int dotCount = 0;
 		for (unsigned int i=0; i<desiredPricePer.size();i++)
 		{
@@ -183,6 +231,10 @@ namespace BP
 
 	void Order::setPriceOnTop(std::string desiredPriceOnTop)
 	{
+		if (desiredPriceOnTop.size() == 0)
+		{
+			throw std::invalid_argument("Price on top selection invalid: entry is empty");
+		}
 		unsigned int dotCount = 0;
 		for (unsigned int i=0; i<desiredPriceOnTop.size();i++)
 		{
@@ -323,6 +375,14 @@ namespace BP
 				cDecal = stockboard->theStockboard[match].sSheetDecal;
 				cPrice = stockboard->theStockboard[match].sSheetPrice;
 			}
+		}
+		if (cChop < boxChop)
+		{
+			throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit " + std::to_string(boxChop));
+		}
+		if (cDecal < boxDecal)
+		{
+			throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has decal big enough to fit " + std::to_string(boxDecal));
 		}
 		sheetChop = cChop;
 		sheetDecal = cDecal;

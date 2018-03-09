@@ -3,9 +3,20 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	this->setWindowState(Qt::WindowMaximized);
-
-	order = new BP::Order;
+	this->setFixedSize(QSize(461, 637));
+	//In distribution folder make sure structured so can get this
+	this->setWindowIcon(QIcon("../resources/box.png"));
+	//Will give error message and close upon start up if order's
+	//construction throws because missing data file
+	try
+	{
+		order = new BP::Order;
+	}
+	catch (std::runtime_error &r)
+	{
+		showMessage(r.what());
+		QTimer::singleShot(0, this, SLOT(close()));
+	}
 
 	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(calculateValues()));
 
@@ -21,6 +32,18 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 	connect(ui.lineEditPOT, SIGNAL(returnPressed()), this, SLOT(setPOT()));
 }
 
+void BPViewer::showMessage(std::string text)
+{
+	QString message = QString::fromStdString(text);
+	QMessageBox msg;
+	msg.setWindowTitle("Error");
+	msg.setText(message);
+	//In distribution folder make sure structured so can get this
+	msg.setIconPixmap(QPixmap("../resources/error.png"));
+	msg.setWindowIcon(QIcon("../resources/box.png"));
+	msg.exec();
+}
+
 void BPViewer::setFlute()
 {
 	//Get text from label
@@ -29,14 +52,12 @@ void BPViewer::setFlute()
 	try
 	{
 		order->setFlute(inString.toStdString());
+		ui.tickFlute->setValue(1);
+		
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -47,14 +68,11 @@ void BPViewer::setPW()
 	try
 	{
 		order->setPaperWeight(inString.toStdString());
+		ui.tickPW->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -64,14 +82,11 @@ void BPViewer::setPQ()
 	try
 	{
 		order->setPaperQuality(inString.toStdString());
+		ui.tickPQ->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -81,14 +96,11 @@ void BPViewer::setStyle()
 	try
 	{
 		order->setStyle(inString.toStdString());
+		ui.tickStyle->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -98,14 +110,11 @@ void BPViewer::setLength()
 	try
 	{
 		order->setBoxLength(inString.toStdString());
+		ui.tickLength->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -115,14 +124,11 @@ void BPViewer::setWidth()
 	try
 	{
 		order->setBoxWidth(inString.toStdString());
+		ui.tickWidth->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -132,14 +138,11 @@ void BPViewer::setHeight()
 	try
 	{
 		order->setBoxHeight(inString.toStdString());
+		ui.tickHeight->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -149,14 +152,11 @@ void BPViewer::setQuantity()
 	try
 	{
 		order->setQuantity(inString.toStdString());
+		ui.tickQuantity->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -166,14 +166,11 @@ void BPViewer::setPPB()
 	try
 	{
 		order->setPricePerBox(inString.toStdString());
+		ui.tickPPB->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -183,14 +180,11 @@ void BPViewer::setPOT()
 	try
 	{
 		order->setPriceOnTop(inString.toStdString());
+		ui.tickPOT->setValue(1);
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 	}
 }
 
@@ -202,11 +196,7 @@ void BPViewer::calculateValues()
 	}
 	catch (std::invalid_argument &e)
 	{
-		QString message = QString::fromStdString(e.what());
-		QMessageBox msg;
-		msg.setText("Error");
-		msg.setInformativeText(message);
-		msg.exec();
+		showMessage(e.what());
 		return;
 	}
 	//Set:
@@ -225,76 +215,3 @@ void BPViewer::calculateValues()
 	toString = QString::fromStdString(order->generateInformation());
 	ui.textInfo->setText(toString);
 }
-	
-/*
-void BPViewer::multiplyNumber()
-{
-	QObject *origin;
-	origin = sender();
-
-	//Get text from label
-	QString test = ui.label->text();
-	//Set up to convert
-	bool ok;
-	//Convert
-	int testInt = test.toInt(&ok, 10);
-	//Calculate
-	if (origin == ui.pushButton)
-	{
-		testInt = stuff->square(testInt);
-	}
-	if (origin == ui.pushButton1)
-	{
-		testInt = stuff->timesOne(testInt);
-	}
-	if (origin == ui.pushButton2)
-	{
-		testInt = stuff->timesTwo(testInt);
-	}
-	if (origin == ui.pushButton3)
-	{
-		testInt = stuff->timesThree(testInt);
-	}
-
-	//Turn back to QString
-	test = QString::number(testInt);
-	//Put back in label
-	ui.label->setText(test);
-}
-
-void BPViewer::newNumber()
-{
-	QObject *origin;
-	origin = sender();
-	if (origin == ui.lineEdit)
-	{
-		QString entered = ui.lineEdit->text();
-		ui.label->setText(entered);
-		ui.lineEdit->clear();
-	}
-	if (origin == ui.lineEdit1)
-	{
-		QString entered = ui.lineEdit1->text();
-		bool ok;
-		stuff->intData1 = entered.toInt(&ok, 10);
-		ui.label1->setText(entered);
-		ui.lineEdit1->clear();
-	}
-	if (origin == ui.lineEdit2)
-	{
-		QString entered = ui.lineEdit2->text();
-		bool ok;
-		stuff->intData2 = entered.toInt(&ok, 10);
-		ui.label2->setText(entered);
-		ui.lineEdit2->clear();
-	}
-	if (origin == ui.lineEdit3)
-	{
-		QString entered = ui.lineEdit3->text();
-		bool ok;
-		stuff->intData3 = entered.toInt(&ok, 10);
-		ui.label3->setText(entered);
-		ui.lineEdit3->clear();
-	}
-}
-*/

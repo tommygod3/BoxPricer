@@ -76,5 +76,16 @@
     <ClInclude Include="..\QTFiles\GeneratedFiles\ui_BPViewer.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="resources\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\BoxPricer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\box.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

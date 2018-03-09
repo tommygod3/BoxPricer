@@ -4,6 +4,7 @@ VSFiles/*
 !VSFiles/BoxPricer.sln
 !VSFiles/BoxPricer.vcxproj
 !VSFiles/BoxPricer.vcxproj.filters
+!VSFiles/resources
 # Ignore spreadsheet for working with
 *.xlsx
 # Ignore user files

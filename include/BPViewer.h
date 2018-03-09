@@ -17,6 +17,8 @@ private:
 
 	BP::Order* order;
 
+	void showMessage(std::string text);
+
 public slots:
 	void setFlute();
 	void setPW();
