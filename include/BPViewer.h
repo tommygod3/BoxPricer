@@ -31,6 +31,7 @@ public slots:
 	void setPPB();
 	void setPOT();
 	void calculateValues();
+	void resetValues();
 };
 
 #endif

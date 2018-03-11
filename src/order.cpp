@@ -58,9 +58,23 @@ namespace BP
 		delete stockboard;
 	}
 
+	void Order::resetAllValues()
+	{
+		flute = "";
+		paperWeight = 0;
+		paperQuality = "";
+		style = "";
+		boxLength = 0;
+		boxWidth = 0;
+		boxHeight = 0;
+		quantity = -1;
+		pricePerBox = 0.05;
+		priceOnTop = 100.00;
+	}
+
 	void Order::setFlute(std::string desiredFlute)
 	{
-		if (desiredFlute.size()>2)
+		if (desiredFlute.size()>3)
 		{
 			throw std::invalid_argument("Flute selection invalid: too many characters");
 		}
@@ -392,16 +406,17 @@ namespace BP
 	void Order::doPricing()
 	{
 		unsigned int boxPerSheet = (sheetChop / boxChop);
-		orderCost = (quantity*sheetPrice) / boxPerSheet;
+		unsigned int noOfSheets = ceil(quantity / boxPerSheet);
+		orderCost = noOfSheets * sheetPrice;
 		customerPrice = (pricePerBox*quantity) + priceOnTop + orderCost;
 	}
 
 	std::string Order::generateInformation()
 	{
 		double sqMeterOfBox = (boxChop*boxDecal)/1000000;
-		std::string info = "Square meter of box: " + std::to_string(sqMeterOfBox) +
-		"\nSquare meter of order: " + std::to_string((sqMeterOfBox*quantity)) + 
-		"\nMinimum quantity of boxes to buy board in: " + std::to_string(((200/sqMeterOfBox)+15));
+		std::string info = "Square metre of box: " + std::to_string(sqMeterOfBox) +
+		"\n\nSquare metre of order: " + std::to_string((sqMeterOfBox*quantity)) + 
+		"\n\nMinimum quantity of boxes to buy board in: " + std::to_string(int(ceil((200/sqMeterOfBox)+15)));
 		return info;
 	}
 

@@ -3,7 +3,7 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	this->setFixedSize(QSize(461, 637));
+	this->setFixedSize(QSize(461, 596));
 	//In distribution folder make sure structured so can get this
 	this->setWindowIcon(QIcon("../resources/box.png"));
 	//Will give error message and close upon start up if order's
@@ -18,26 +18,28 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 		QTimer::singleShot(0, this, SLOT(close()));
 	}
 
-	connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(calculateValues()));
+	connect(ui.pushButtonCalc, SIGNAL(clicked()), this, SLOT(calculateValues()));
+	connect(ui.pushButtonReset, SIGNAL(clicked()), this, SLOT(resetValues()));
 
-	connect(ui.lineEditFlute, SIGNAL(returnPressed()), this, SLOT(setFlute()));
-	connect(ui.lineEditPW, SIGNAL(returnPressed()), this, SLOT(setPW()));
-	connect(ui.lineEditPQ, SIGNAL(returnPressed()), this, SLOT(setPQ()));
-	connect(ui.lineEditStyle, SIGNAL(returnPressed()), this, SLOT(setStyle()));
-	connect(ui.lineEditLength, SIGNAL(returnPressed()), this, SLOT(setLength()));
-	connect(ui.lineEditWidth, SIGNAL(returnPressed()), this, SLOT(setWidth()));
-	connect(ui.lineEditHeight, SIGNAL(returnPressed()), this, SLOT(setHeight()));
-	connect(ui.lineEditQuantity, SIGNAL(returnPressed()), this, SLOT(setQuantity()));
-	connect(ui.lineEditPPB, SIGNAL(returnPressed()), this, SLOT(setPPB()));
-	connect(ui.lineEditPOT, SIGNAL(returnPressed()), this, SLOT(setPOT()));
+	connect(ui.lineEditFlute, SIGNAL(editingFinished()), this, SLOT(setFlute()));
+	connect(ui.lineEditPW, SIGNAL(editingFinished()), this, SLOT(setPW()));
+	connect(ui.lineEditPQ, SIGNAL(editingFinished()), this, SLOT(setPQ()));
+	connect(ui.lineEditStyle, SIGNAL(editingFinished()), this, SLOT(setStyle()));
+	connect(ui.lineEditLength, SIGNAL(editingFinished()), this, SLOT(setLength()));
+	connect(ui.lineEditWidth, SIGNAL(editingFinished()), this, SLOT(setWidth()));
+	connect(ui.lineEditHeight, SIGNAL(editingFinished()), this, SLOT(setHeight()));
+	connect(ui.lineEditQuantity, SIGNAL(editingFinished()), this, SLOT(setQuantity()));
+	connect(ui.lineEditPPB, SIGNAL(editingFinished()), this, SLOT(setPPB()));
+	connect(ui.lineEditPOT, SIGNAL(editingFinished()), this, SLOT(setPOT()));
 }
 
 void BPViewer::showMessage(std::string text)
 {
 	QString message = QString::fromStdString(text);
 	QMessageBox msg;
-	msg.setWindowTitle("Error");
-	msg.setText(message);
+	//msg.setWindowTitle("Error");
+	msg.setText("Error");
+	msg.setInformativeText(message);
 	//In distribution folder make sure structured so can get this
 	msg.setIconPixmap(QPixmap("../resources/error.png"));
 	msg.setWindowIcon(QIcon("../resources/box.png"));
@@ -49,15 +51,18 @@ void BPViewer::setFlute()
 	//Get text from label
 	QString inString = ui.lineEditFlute->text();
 	//Set with converted QString
-	try
+	if(!ui.lineEditFlute->text().isEmpty())
 	{
-		order->setFlute(inString.toStdString());
-		ui.tickFlute->setValue(1);
-		
-	}
-	catch (std::invalid_argument &e)
-	{
-		showMessage(e.what());
+		try
+		{
+			order->setFlute(inString.toStdString());
+			ui.tickFlute->setValue(1);
+
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
 }
 
@@ -65,14 +70,17 @@ void BPViewer::setFlute()
 void BPViewer::setPW()
 {
 	QString inString = ui.lineEditPW->text();
-	try
+	if (!ui.lineEditPW->text().isEmpty())
 	{
-		order->setPaperWeight(inString.toStdString());
-		ui.tickPW->setValue(1);
-	}
-	catch (std::invalid_argument &e)
-	{
-		showMessage(e.what());
+		try
+		{
+			order->setPaperWeight(inString.toStdString());
+			ui.tickPW->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
 }
 
@@ -214,4 +222,45 @@ void BPViewer::calculateValues()
 
 	toString = QString::fromStdString(order->generateInformation());
 	ui.textInfo->setText(toString);
+}
+
+void BPViewer::resetValues()
+{
+	ui.lineEditFlute->setText("");
+	ui.tickFlute->setValue(0);
+
+	ui.lineEditPW->setText("");
+	ui.tickPW->setValue(0);
+
+	ui.lineEditPQ->setText("");
+	ui.tickPQ->setValue(0);
+
+	ui.lineEditStyle->setText("");
+	ui.tickStyle->setValue(0);
+
+	ui.lineEditLength->setText("");
+	ui.tickLength->setValue(0);
+
+	ui.lineEditWidth->setText("");
+	ui.tickWidth->setValue(0);
+
+	ui.lineEditHeight->setText("");
+	ui.tickHeight->setValue(0);
+
+	ui.lineEditQuantity->setText("");
+	ui.tickQuantity->setValue(0);
+
+	ui.lineEditPPB->setText("");
+	ui.tickPPB->setValue(0);
+
+	ui.lineEditPOT->setText("");
+	ui.tickPOT->setValue(0);
+
+	ui.lineReadChop->setText("");
+	ui.lineReadDecal->setText("");
+	ui.lineReadCost->setText("");
+	ui.lineReadPrice->setText("");
+	ui.textInfo->setText("");
+
+	order->resetAllValues();
 }

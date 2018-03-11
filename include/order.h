@@ -47,6 +47,8 @@ namespace BP
     public: 
         Order();
         ~Order();
+		//Function to reset to blank
+		void resetAllValues();
         //Functions to set order values
         void setFlute(std::string desiredFlute);
         void setPaperWeight(std::string desiredWeight);
