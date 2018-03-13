@@ -72,6 +72,20 @@ namespace BP
         void doStockSheet();
         void doPricing();
         std::string generateInformation();
+		double sqMetBox();
+		double sqMetOrder();
+		int quantBoxNeeded();
+		//Functions that check inputs are set
+		bool checkFluteSet();
+		bool checkPaperWeightSet();
+		bool checkPaperQualitySet();
+		bool checkStyleSet();
+		bool checkBoxLengthSet();
+		bool checkBoxWidthSet();
+		bool checkBoxHeightSet();
+		bool checkQuantitySet();
+		bool checkPricePerBoxSet();
+		bool checkPriceOnTopSet();
         //Functionality if using console
         void consoleDisplay();
         void consoleInput();

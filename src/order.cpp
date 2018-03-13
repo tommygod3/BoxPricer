@@ -300,35 +300,35 @@ namespace BP
 
 	std::string Order::checkSet()
 	{
-		if (flute == "")
+		if (!checkFluteSet())
 		{
 			return "Flute not set";
 		}
-		if (paperWeight == 0)
+		if (!checkPaperWeightSet())
 		{
 			return "Paper Weight not set";
 		}
-		if (paperQuality == "")
+		if (!checkPaperQualitySet())
 		{
 			return "Paper Quality not set";
 		}
-		if (style == "")
+		if (!checkStyleSet())
 		{
 			return "Style not set";
 		}
-		if (boxLength == 0)
+		if (!checkBoxLengthSet())
 		{
 			return "Length not set";
 		}
-		if (boxWidth == 0)
+		if (!checkBoxWidthSet())
 		{
 			return "Width not set";
 		}
-		if (boxHeight == 0)
+		if (!checkBoxHeightSet())
 		{
 			return "Height not set";
 		}
-		if (quantity == -1)
+		if (!checkQuantitySet())
 		{
 			return "Quantity not set";
 		}
@@ -413,11 +413,75 @@ namespace BP
 
 	std::string Order::generateInformation()
 	{
-		double sqMeterOfBox = (boxChop*boxDecal)/1000000;
-		std::string info = "Square metre of box: " + std::to_string(sqMeterOfBox) +
-		"\n\nSquare metre of order: " + std::to_string((sqMeterOfBox*quantity)) + 
-		"\n\nMinimum quantity of boxes to buy board in: " + std::to_string(int(ceil((200/sqMeterOfBox)+15)));
+		std::string info = "Square metre of box: " + std::to_string(sqMetBox()) + "\n";
+		info += "Square metre of order: " + std::to_string(sqMetOrder()) + "\n";
+		info += "Minimum quantity of boxes to buy board in: " + std::to_string(quantBoxNeeded());
 		return info;
+	}
+
+	double Order::sqMetBox()
+	{
+		return (boxChop*boxDecal)/1000000;
+	}
+
+	double Order::sqMetOrder()
+	{
+		return (boxChop*boxDecal*quantity)/1000000;
+	}
+
+	int Order::quantBoxNeeded()
+	{
+		return ceil((200 / ((boxChop*boxDecal) / 1000000)) + 15);
+	}
+
+	bool Order::checkFluteSet()
+	{
+		return (flute != "") ? 1 : 0;
+	}
+
+	bool Order::checkPaperWeightSet()
+	{
+		return (paperWeight != 0) ? 1 : 0;
+	}
+
+	bool Order::checkPaperQualitySet()
+	{
+		return (paperQuality != "") ? 1 : 0;
+	}
+
+	bool Order::checkStyleSet()
+	{
+		return (style != "") ? 1 : 0;
+	}
+
+	bool Order::checkBoxLengthSet()
+	{
+		return (boxLength != 0) ? 1 : 0;
+	}
+
+	bool Order::checkBoxWidthSet()
+	{
+		return (boxWidth != 0) ? 1 : 0;
+	}
+
+	bool Order::checkBoxHeightSet()
+	{
+		return (boxHeight != 0) ? 1 : 0;
+	}
+
+	bool Order::checkQuantitySet()
+	{
+		return (quantity != -1) ? 1 : 0;
+	}
+
+	bool Order::checkPricePerBoxSet()
+	{
+		return (boxLength != 0.05) ? 1 : 0;
+	}
+
+	bool Order::checkPriceOnTopSet()
+	{
+		return (boxLength != 100.00) ? 1 : 0;
 	}
 
 	void Order::consoleDisplay()

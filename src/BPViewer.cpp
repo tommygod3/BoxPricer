@@ -3,7 +3,7 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	this->setFixedSize(QSize(461, 596));
+	this->setFixedSize(QSize(461, 682));
 	//In distribution folder make sure structured so can get this
 	this->setWindowIcon(QIcon("../resources/box.png"));
 	//Will give error message and close upon start up if order's
@@ -17,6 +17,7 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 		showMessage(r.what());
 		QTimer::singleShot(0, this, SLOT(close()));
 	}
+	
 
 	connect(ui.pushButtonCalc, SIGNAL(clicked()), this, SLOT(calculateValues()));
 	connect(ui.pushButtonReset, SIGNAL(clicked()), this, SLOT(resetValues()));
@@ -25,12 +26,12 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 	connect(ui.lineEditPW, SIGNAL(editingFinished()), this, SLOT(setPW()));
 	connect(ui.lineEditPQ, SIGNAL(editingFinished()), this, SLOT(setPQ()));
 	connect(ui.lineEditStyle, SIGNAL(editingFinished()), this, SLOT(setStyle()));
-	connect(ui.lineEditLength, SIGNAL(editingFinished()), this, SLOT(setLength()));
-	connect(ui.lineEditWidth, SIGNAL(editingFinished()), this, SLOT(setWidth()));
-	connect(ui.lineEditHeight, SIGNAL(editingFinished()), this, SLOT(setHeight()));
-	connect(ui.lineEditQuantity, SIGNAL(editingFinished()), this, SLOT(setQuantity()));
-	connect(ui.lineEditPPB, SIGNAL(editingFinished()), this, SLOT(setPPB()));
-	connect(ui.lineEditPOT, SIGNAL(editingFinished()), this, SLOT(setPOT()));
+	connect(ui.spinLength, SIGNAL(editingFinished()), this, SLOT(setLength()));
+	connect(ui.spinWidth, SIGNAL(editingFinished()), this, SLOT(setWidth()));
+	connect(ui.spinHeight, SIGNAL(editingFinished()), this, SLOT(setHeight()));
+	connect(ui.spinQuantity, SIGNAL(editingFinished()), this, SLOT(setQuantity()));
+	connect(ui.doubleSpinPPB, SIGNAL(editingFinished()), this, SLOT(setPPB()));
+	connect(ui.doubleSpinPOT, SIGNAL(editingFinished()), this, SLOT(setPOT()));
 }
 
 void BPViewer::showMessage(std::string text)
@@ -51,36 +52,31 @@ void BPViewer::setFlute()
 	//Get text from label
 	QString inString = ui.lineEditFlute->text();
 	//Set with converted QString
-	if(!ui.lineEditFlute->text().isEmpty())
+	try
 	{
-		try
-		{
-			order->setFlute(inString.toStdString());
-			ui.tickFlute->setValue(1);
+		order->setFlute(inString.toStdString());
+		ui.tickFlute->setValue(1);
 
-		}
-		catch (std::invalid_argument &e)
-		{
-			showMessage(e.what());
-		}
 	}
+	catch (std::invalid_argument &e)
+	{
+		showMessage(e.what());
+	}
+	
 }
 
 
 void BPViewer::setPW()
 {
 	QString inString = ui.lineEditPW->text();
-	if (!ui.lineEditPW->text().isEmpty())
+	try
 	{
-		try
-		{
-			order->setPaperWeight(inString.toStdString());
-			ui.tickPW->setValue(1);
-		}
-		catch (std::invalid_argument &e)
-		{
-			showMessage(e.what());
-		}
+		order->setPaperWeight(inString.toStdString());
+		ui.tickPW->setValue(1);
+	}
+	catch (std::invalid_argument &e)
+	{
+		showMessage(e.what());
 	}
 }
 
@@ -114,49 +110,58 @@ void BPViewer::setStyle()
 
 void BPViewer::setLength()
 {
-	QString inString = ui.lineEditLength->text();
-	try
+	QString inString = ui.spinLength->cleanText();
+	if (ui.spinLength->cleanText() != "0")
 	{
-		order->setBoxLength(inString.toStdString());
-		ui.tickLength->setValue(1);
-	}
-	catch (std::invalid_argument &e)
-	{
-		showMessage(e.what());
+		try
+		{
+			order->setBoxLength(inString.toStdString());
+			ui.tickLength->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
 }
 
 void BPViewer::setWidth()
 {
-	QString inString = ui.lineEditWidth->text();
-	try
+	QString inString = ui.spinWidth->cleanText();
+	if (ui.spinWidth->cleanText() != "0")
 	{
-		order->setBoxWidth(inString.toStdString());
-		ui.tickWidth->setValue(1);
-	}
-	catch (std::invalid_argument &e)
-	{
-		showMessage(e.what());
+		try
+		{
+			order->setBoxWidth(inString.toStdString());
+			ui.tickWidth->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
 }
 
 void BPViewer::setHeight()
 {
-	QString inString = ui.lineEditHeight->text();
-	try
+	QString inString = ui.spinHeight->cleanText();
+	if (ui.spinHeight->cleanText() != "0")
 	{
-		order->setBoxHeight(inString.toStdString());
-		ui.tickHeight->setValue(1);
-	}
-	catch (std::invalid_argument &e)
-	{
-		showMessage(e.what());
+		try
+		{
+			order->setBoxHeight(inString.toStdString());
+			ui.tickHeight->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
 }
 
 void BPViewer::setQuantity()
 {
-	QString inString = ui.lineEditQuantity->text();
+	QString inString = ui.spinQuantity->cleanText();
 	try
 	{
 		order->setQuantity(inString.toStdString());
@@ -166,33 +171,40 @@ void BPViewer::setQuantity()
 	{
 		showMessage(e.what());
 	}
+	
 }
 
 void BPViewer::setPPB()
 {
-	QString inString = ui.lineEditPPB->text();
-	try
+	QString inString = ui.doubleSpinPPB->cleanText();
+	if (ui.doubleSpinPPB->cleanText() != "0.05")
 	{
-		order->setPricePerBox(inString.toStdString());
-		ui.tickPPB->setValue(1);
-	}
-	catch (std::invalid_argument &e)
-	{
-		showMessage(e.what());
+		try
+		{
+			order->setPricePerBox(inString.toStdString());
+			ui.tickPPB->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
 }
 
 void BPViewer::setPOT()
 {
-	QString inString = ui.lineEditPOT->text();
-	try
+	QString inString = ui.doubleSpinPOT->cleanText();
+	if (ui.doubleSpinPOT->cleanText() != "100.00")
 	{
-		order->setPriceOnTop(inString.toStdString());
-		ui.tickPOT->setValue(1);
-	}
-	catch (std::invalid_argument &e)
-	{
-		showMessage(e.what());
+		try
+		{
+			order->setPriceOnTop(inString.toStdString());
+			ui.tickPOT->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
 }
 
@@ -209,18 +221,24 @@ void BPViewer::calculateValues()
 	}
 	//Set:
 	QString toString = QString::number(order->getBoxChop());
+	toString += " mm";
 	ui.lineReadChop->setText(toString);
 
 	toString = QString::number(order->getBoxDecal());
+	toString += " mm";
 	ui.lineReadDecal->setText(toString);
 
-	toString = QString::number(order->getOrderCost());
+	toString = QString::number(order->getOrderCost(),'f',2);
+	toString = QString(163) + toString;
 	ui.lineReadCost->setText(toString);
 
-	toString = QString::number(order->getCustomerPrice());
+	toString = QString::number(order->getCustomerPrice(),'f',2);
+	toString = QString(163) + toString;
 	ui.lineReadPrice->setText(toString);
 
-	toString = QString::fromStdString(order->generateInformation());
+	toString = "Square metre of box: " + QString::number(order->sqMetBox(),'g',5) + " m" + QChar(0x00B2) + "\n\n";
+	toString += "Square metre of order: " + QString::number(order->sqMetOrder(),'g',5) + " m" + QChar(0x00B2) + "\n\n";
+	toString += "Minimum quantity of boxes to buy board in: " + QString::number(order->quantBoxNeeded());
 	ui.textInfo->setText(toString);
 }
 
@@ -238,23 +256,23 @@ void BPViewer::resetValues()
 	ui.lineEditStyle->setText("");
 	ui.tickStyle->setValue(0);
 
-	ui.lineEditLength->setText("");
+	ui.spinLength->setValue(0);
 	ui.tickLength->setValue(0);
 
-	ui.lineEditWidth->setText("");
+	ui.spinWidth->setValue(0);
 	ui.tickWidth->setValue(0);
 
-	ui.lineEditHeight->setText("");
+	ui.spinHeight->setValue(0);
 	ui.tickHeight->setValue(0);
 
-	ui.lineEditQuantity->setText("");
+	ui.spinQuantity->setValue(0);
 	ui.tickQuantity->setValue(0);
 
-	ui.lineEditPPB->setText("");
-	ui.tickPPB->setValue(0);
+	ui.doubleSpinPPB->setValue(0.05);
+	ui.tickPPB->setValue(1);
 
-	ui.lineEditPOT->setText("");
-	ui.tickPOT->setValue(0);
+	ui.doubleSpinPOT->setValue(100);
+	ui.tickPOT->setValue(1);
 
 	ui.lineReadChop->setText("");
 	ui.lineReadDecal->setText("");
