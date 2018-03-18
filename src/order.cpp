@@ -13,7 +13,7 @@ namespace BP
 
 	Order::Order()
 	{
-		blanksizes = new Blanksizes();
+		blanksizes = new Blanksizes("../data/");
 		stockboard = new Stockboard();
 		//Uses console input if not using GUI
 		if (!GUI)
@@ -68,8 +68,8 @@ namespace BP
 		boxWidth = 0;
 		boxHeight = 0;
 		quantity = -1;
-		pricePerBox = 0.05;
-		priceOnTop = 100.00;
+		pricePerBox = 0.30;
+		priceOnTop = 1.5;
 	}
 
 	void Order::setFlute(std::string desiredFlute)
@@ -341,28 +341,29 @@ namespace BP
 		//Throws if inputs not found in file
 		if (blanksizes->getMatch(style,flute).first<0)
 		{
-			throw std::invalid_argument("Error with inputted values: no match found for Style and Flute in Blanksize file");
+			throw std::invalid_argument("Error with inputted values: no match found for Style in Blanksize file");
+		}
+		if (blanksizes->getMatch(style, flute).second<0)
+		{
+			throw std::invalid_argument("Error with inputted values: no match found for Flute in Allowance file");
 		}
 		//Get location in data structure using style and flute
-		unsigned int indexNo = blanksizes->getMatch(style,flute).first;
+		unsigned int styleNo = blanksizes->getMatch(style,flute).first;
 		unsigned int allowanceNo = blanksizes->getMatch(style,flute).second;
-		//Set allowances from data structure
-		allowance[0] = blanksizes->blanksizeList[indexNo].bAllowances[allowanceNo].second[0];
-		allowance[1] = blanksizes->blanksizeList[indexNo].bAllowances[allowanceNo].second[1];
+		//Set allowance from data structure
+		allowance = blanksizes->allowanceList[allowanceNo].second;
 		//Set chop from data structure
-		boxChop = (blanksizes->blanksizeList[indexNo].bParameters[0]*boxLength);
-		boxChop += (blanksizes->blanksizeList[indexNo].bParameters[1]*boxWidth);
-		boxChop += (blanksizes->blanksizeList[indexNo].bParameters[2]*boxHeight);
-		boxChop += blanksizes->blanksizeList[indexNo].bParameters[3];
-		boxChop += (blanksizes->blanksizeList[indexNo].bParameters[4]*allowance[0]);
-		boxChop += (blanksizes->blanksizeList[indexNo].bParameters[5]*allowance[1]);
+		boxChop = (blanksizes->blanksizeList[styleNo].bParameters[0]*boxLength);
+		boxChop += (blanksizes->blanksizeList[styleNo].bParameters[1]*boxWidth);
+		boxChop += (blanksizes->blanksizeList[styleNo].bParameters[2]*boxHeight);
+		boxChop += blanksizes->blanksizeList[styleNo].bParameters[3];
+		boxChop += (blanksizes->blanksizeList[styleNo].bParameters[4]*allowance);
 		//Set decal from data structure
-		boxDecal = (blanksizes->blanksizeList[indexNo].bParameters[6]*boxLength);
-		boxDecal += (blanksizes->blanksizeList[indexNo].bParameters[7]*boxWidth);
-		boxDecal += (blanksizes->blanksizeList[indexNo].bParameters[8]*boxHeight);
-		boxDecal += blanksizes->blanksizeList[indexNo].bParameters[9];
-		boxDecal += (blanksizes->blanksizeList[indexNo].bParameters[10]*allowance[0]);
-		boxDecal += (blanksizes->blanksizeList[indexNo].bParameters[11]*allowance[1]);
+		boxDecal = (blanksizes->blanksizeList[styleNo].bParameters[5]*boxLength);
+		boxDecal += (blanksizes->blanksizeList[styleNo].bParameters[6]*boxWidth);
+		boxDecal += (blanksizes->blanksizeList[styleNo].bParameters[7]*boxHeight);
+		boxDecal += blanksizes->blanksizeList[styleNo].bParameters[8];
+		boxDecal += (blanksizes->blanksizeList[styleNo].bParameters[9]*allowance);
 	}
 
 
@@ -405,10 +406,12 @@ namespace BP
 
 	void Order::doPricing()
 	{
-		unsigned int boxPerSheet = (sheetChop / boxChop);
+		unsigned int boxCPerSheet = (sheetChop / boxChop);
+		unsigned int boxDPerSheet = (sheetDecal / boxDecal);
+		unsigned int boxPerSheet = boxCPerSheet *boxDPerSheet;
 		unsigned int noOfSheets = ceil(quantity / boxPerSheet);
 		orderCost = noOfSheets * sheetPrice;
-		customerPrice = (pricePerBox*quantity) + priceOnTop + orderCost;
+		customerPrice = ((pricePerBox*quantity) + orderCost) * priceOnTop;
 	}
 
 	std::string Order::generateInformation()

@@ -244,41 +244,50 @@ void BPViewer::calculateValues()
 
 void BPViewer::resetValues()
 {
-	ui.lineEditFlute->setText("");
-	ui.tickFlute->setValue(0);
+	QMessageBox resetBox;
+	resetBox.setWindowIcon(QIcon("../resources/box.png"));
+	resetBox.setText("Are you sure you want to reset all values?");
+	resetBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+	resetBox.setDefaultButton(QMessageBox::No);
+	int ret = resetBox.exec(); 
+	if (ret == QMessageBox::Yes)
+	{
+		ui.lineEditFlute->setText("");
+		ui.tickFlute->setValue(0);
 
-	ui.lineEditPW->setText("");
-	ui.tickPW->setValue(0);
+		ui.lineEditPW->setText("");
+		ui.tickPW->setValue(0);
 
-	ui.lineEditPQ->setText("");
-	ui.tickPQ->setValue(0);
+		ui.lineEditPQ->setText("");
+		ui.tickPQ->setValue(0);
 
-	ui.lineEditStyle->setText("");
-	ui.tickStyle->setValue(0);
+		ui.lineEditStyle->setText("");
+		ui.tickStyle->setValue(0);
 
-	ui.spinLength->setValue(0);
-	ui.tickLength->setValue(0);
+		ui.spinLength->setValue(0);
+		ui.tickLength->setValue(0);
 
-	ui.spinWidth->setValue(0);
-	ui.tickWidth->setValue(0);
+		ui.spinWidth->setValue(0);
+		ui.tickWidth->setValue(0);
 
-	ui.spinHeight->setValue(0);
-	ui.tickHeight->setValue(0);
+		ui.spinHeight->setValue(0);
+		ui.tickHeight->setValue(0);
 
-	ui.spinQuantity->setValue(0);
-	ui.tickQuantity->setValue(0);
+		ui.spinQuantity->setValue(0);
+		ui.tickQuantity->setValue(0);
 
-	ui.doubleSpinPPB->setValue(0.05);
-	ui.tickPPB->setValue(1);
+		ui.doubleSpinPPB->setValue(0.05);
+		ui.tickPPB->setValue(1);
 
-	ui.doubleSpinPOT->setValue(100);
-	ui.tickPOT->setValue(1);
+		ui.doubleSpinPOT->setValue(100);
+		ui.tickPOT->setValue(1);
 
-	ui.lineReadChop->setText("");
-	ui.lineReadDecal->setText("");
-	ui.lineReadCost->setText("");
-	ui.lineReadPrice->setText("");
-	ui.textInfo->setText("");
+		ui.lineReadChop->setText("");
+		ui.lineReadDecal->setText("");
+		ui.lineReadCost->setText("");
+		ui.lineReadPrice->setText("");
+		ui.textInfo->setText("");
 
-	order->resetAllValues();
+		order->resetAllValues();
+	}
 }

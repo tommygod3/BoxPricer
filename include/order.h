@@ -32,10 +32,10 @@ namespace BP
         //How many of them to order
         int quantity = -1;
         //Pricing info
-        double pricePerBox = 0.05;
-        double priceOnTop = 100.00;
+        double pricePerBox = 0.30;
+        double priceOnTop = 1.5;
         //Calculated:
-        unsigned int allowance[2];
+        unsigned int allowance;
         double sheetChop;
         double sheetDecal;
         double sheetPrice;

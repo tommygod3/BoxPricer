@@ -64,7 +64,7 @@
        </widget>
       </item>
       <item row="0" column="2" colspan="2">
-       <widget class="QLabel" name="labelCalc">
+       <widget class="QLabel" name="labelResults">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -79,7 +79,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Calculated values</string>
+         <string>Results</string>
         </property>
        </widget>
       </item>
@@ -835,7 +835,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Price per box:</string>
+         <string>Markup per box:</string>
         </property>
        </widget>
       </item>
@@ -884,7 +884,7 @@
          <double>1000000.000000000000000</double>
         </property>
         <property name="value">
-         <double>0.050000000000000</double>
+         <double>0.300000000000000</double>
         </property>
        </widget>
       </item>
@@ -902,7 +902,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Price on top:</string>
+         <string>Price multiplier:</string>
         </property>
        </widget>
       </item>
@@ -942,13 +942,19 @@
          </font>
         </property>
         <property name="prefix">
-         <string>£</string>
+         <string/>
+        </property>
+        <property name="suffix">
+         <string> x</string>
         </property>
         <property name="maximum">
          <double>1000000000.000000000000000</double>
         </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
         <property name="value">
-         <double>100.000000000000000</double>
+         <double>1.500000000000000</double>
         </property>
        </widget>
       </item>
