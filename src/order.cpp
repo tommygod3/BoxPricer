@@ -277,6 +277,11 @@ namespace BP
 		return customerPrice;
 	}
 
+	double Order::getCustomerPricePer()
+	{
+		return customerPricePer;
+	}
+
 	double Order::getBoxChop()
 	{
 		return boxChop;
@@ -366,42 +371,127 @@ namespace BP
 		boxDecal += (blanksizes->blanksizeList[styleNo].bParameters[9]*allowance);
 	}
 
-
 	void Order::doStockSheet()
 	{
 		//Using stockboard structure:
 		//Read in positions of matches to vector
-		std::vector<int> matches = stockboard->getMatches(flute,paperWeight,paperQuality);
+		int match = stockboard->getBoardMatch(flute,paperWeight,paperQuality);
 		//Initialise comparing variables to do maths with and choose best sheet
 		double cChop = -1;
 		double cDecal = -1;
 		double cPrice;
-		if (matches.size()==0)
+		if (match == -1)
 		{
 			throw std::invalid_argument("Error with inputted values: no match found for Flute, Paper Weight and Paper Quality in Stockboard file");
 		}
-		for (unsigned int i = 0; i < matches.size(); i++)
+		//If under 200:
+		if (getPricingTier() == 0)
 		{
-			int match = matches[i];
-			//Checks for biggest chop
-			if (stockboard->theStockboard[match].sSheetChop > cChop)
+			for (unsigned int i = 0; i < stockboard->theStockboard[match].sheets.size(); i++)
 			{
-				cChop = stockboard->theStockboard[match].sSheetChop;
-				cDecal = stockboard->theStockboard[match].sSheetDecal;
-				cPrice = stockboard->theStockboard[match].sSheetPrice;
+				//Checks for biggest chop - TODO LEAST WASTAGE
+				if (stockboard->theStockboard[match].sheets[i].bSheetChop > cChop)
+				{
+					cChop = stockboard->theStockboard[match].sheets[i].bSheetChop;
+					cDecal = stockboard->theStockboard[match].sheets[i].bSheetDecal;
+					cPrice = stockboard->theStockboard[match].sheets[i].bSheetPrice;
+				}
+			}
+			if (cChop < boxChop)
+			{
+				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit " + std::to_string(boxChop));
+			}
+			if (cDecal < boxDecal)
+			{
+				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has decal big enough to fit " + std::to_string(boxDecal));
 			}
 		}
-		if (cChop < boxChop)
+		else
 		{
-			throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit " + std::to_string(boxChop));
-		}
-		if (cDecal < boxDecal)
-		{
-			throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has decal big enough to fit " + std::to_string(boxDecal));
+			//Placeholder: TODO ADD PRICING LOGIC
+			for (unsigned int i = 0; i < stockboard->theStockboard[match].sheets.size(); i++)
+			{
+				//Checks for biggest chop
+				if (stockboard->theStockboard[match].sheets[i].bSheetChop > cChop)
+				{
+					cChop = stockboard->theStockboard[match].sheets[i].bSheetChop;
+					cDecal = stockboard->theStockboard[match].sheets[i].bSheetDecal;
+					cPrice = stockboard->theStockboard[match].sheets[i].bSheetPrice;
+				}
+			}
+			if (cChop < boxChop)
+			{
+				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit " + std::to_string(boxChop));
+			}
+			if (cDecal < boxDecal)
+			{
+				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has decal big enough to fit " + std::to_string(boxDecal));
+			}
 		}
 		sheetChop = cChop;
 		sheetDecal = cDecal;
 		sheetPrice = cPrice;
+	}
+	
+	int Order::getPricingTier()
+	{
+		if (sqMetOrder() >= 10000)
+		{
+			return 10000;
+		}
+		else if (sqMetOrder() >= 5000)
+		{
+			return 5000;
+		}
+		else if (sqMetOrder() >= 3000)
+		{
+			return 3000;
+		}
+		else if (sqMetOrder() >= 1000)
+		{
+			return 1000;
+		}
+		else if (sqMetOrder() >= 500)
+		{
+			return 500;
+		}
+		else if (sqMetOrder() >= 200)
+		{
+			return 200;
+		}
+		else if (sqMetOrder() > 0)
+		{
+			return 0;
+		}
+	}
+
+	int Order::getCheaperTier()
+	{
+		if (getPricingTier() == 5000 && (stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[4] > stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[5]))
+		{
+			return 10000;
+		}
+		else if (getPricingTier() == 3000 && (stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[3] > stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[4]))
+		{
+			return 5000;
+		}
+		else if (getPricingTier() == 1000 && (stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[2] > stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[3]))
+		{
+			return 3000;
+		}
+		else if (getPricingTier() == 500 && (stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[1] > stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[2]))
+		{
+			return 1000;
+		}
+		else if (getPricingTier() == 200 && (stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[0] > stockboard->theStockboard[stockboard->getBoardMatch(flute, paperWeight, paperQuality)].prices[1]))
+		{
+			return 500;
+		}
+		else if (getPricingTier() == 0)
+		{
+			return 200;
+		}
+		return 0;
 	}
 
 	void Order::doPricing()
@@ -409,17 +499,17 @@ namespace BP
 		unsigned int boxCPerSheet = (sheetChop / boxChop);
 		unsigned int boxDPerSheet = (sheetDecal / boxDecal);
 		unsigned int boxPerSheet = boxCPerSheet *boxDPerSheet;
-		unsigned int noOfSheets = ceil(quantity / boxPerSheet);
+		int noOfSheets = ceil((double)quantity / boxPerSheet);
 		orderCost = noOfSheets * sheetPrice;
 		customerPrice = ((pricePerBox*quantity) + orderCost) * priceOnTop;
-	}
-
-	std::string Order::generateInformation()
-	{
-		std::string info = "Square metre of box: " + std::to_string(sqMetBox()) + "\n";
-		info += "Square metre of order: " + std::to_string(sqMetOrder()) + "\n";
-		info += "Minimum quantity of boxes to buy board in: " + std::to_string(quantBoxNeeded());
-		return info;
+		if (quantity == 0)
+		{
+			customerPricePer = 0;
+		}
+		else
+		{
+			customerPricePer = customerPrice / quantity;
+		}
 	}
 
 	double Order::sqMetBox()
@@ -429,12 +519,12 @@ namespace BP
 
 	double Order::sqMetOrder()
 	{
-		return (boxChop*boxDecal*quantity)/1000000;
+		return sqMetBox()*quantity;
 	}
 
 	int Order::quantBoxNeeded()
 	{
-		return ceil((200 / ((boxChop*boxDecal) / 1000000)) + 15);
+		return ceil(getCheaperTier()/ sqMetBox());
 	}
 
 	bool Order::checkFluteSet()
@@ -494,7 +584,7 @@ namespace BP
 		std::cout << "Decal: " << getBoxDecal() << std::endl;
 		std::cout << "Cost of order: " << getOrderCost() << std::endl;
 		std::cout << "Price of order: " << getCustomerPrice() << std::endl;
-		std::cout << generateInformation() << std::endl;
+		std::cout << generateConsoleInformation() << std::endl;
 	}
 
 	void Order::consoleInput()
@@ -650,5 +740,16 @@ namespace BP
 			consoleInput();
 			return;
 		}
+	}
+
+	std::string Order::generateConsoleInformation()
+	{
+		std::string info = "Square metre of box: " + std::to_string(sqMetBox()) + "\n";
+		info += "Square metre of order: " + std::to_string(sqMetOrder()) + "\n";
+		if (getCheaperTier() != 0)
+		{
+			info += "Minimum quantity of boxes to next pricing tier: " + std::to_string(quantBoxNeeded());
+		}
+		return info;
 	}
 }

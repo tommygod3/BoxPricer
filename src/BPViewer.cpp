@@ -3,7 +3,7 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	this->setFixedSize(QSize(461, 682));
+	this->setFixedSize(QSize(461, 687));
 	//In distribution folder make sure structured so can get this
 	this->setWindowIcon(QIcon("../resources/box.png"));
 	//Will give error message and close upon start up if order's
@@ -236,9 +236,16 @@ void BPViewer::calculateValues()
 	toString = QString(163) + toString;
 	ui.lineReadPrice->setText(toString);
 
+	toString = QString::number(order->getCustomerPricePer(), 'f', 2);
+	toString = QString(163) + toString;
+	ui.lineReadPricePer->setText(toString);
+
 	toString = "Square metre of box: " + QString::number(order->sqMetBox(),'g',5) + " m" + QChar(0x00B2) + "\n\n";
 	toString += "Square metre of order: " + QString::number(order->sqMetOrder(),'g',5) + " m" + QChar(0x00B2) + "\n\n";
-	toString += "Minimum quantity of boxes to buy board in: " + QString::number(order->quantBoxNeeded());
+	if (order->getCheaperTier() != 0)
+	{
+		toString += "Minimum quantity of boxes to next pricing tier: " + QString::number(order->quantBoxNeeded());
+	}
 	ui.textInfo->setText(toString);
 }
 
@@ -276,16 +283,17 @@ void BPViewer::resetValues()
 		ui.spinQuantity->setValue(0);
 		ui.tickQuantity->setValue(0);
 
-		ui.doubleSpinPPB->setValue(0.05);
+		ui.doubleSpinPPB->setValue(0.30);
 		ui.tickPPB->setValue(1);
 
-		ui.doubleSpinPOT->setValue(100);
+		ui.doubleSpinPOT->setValue(1.50);
 		ui.tickPOT->setValue(1);
 
 		ui.lineReadChop->setText("");
 		ui.lineReadDecal->setText("");
 		ui.lineReadCost->setText("");
 		ui.lineReadPrice->setText("");
+		ui.lineReadPricePer->setText("");
 		ui.textInfo->setText("");
 
 		order->resetAllValues();

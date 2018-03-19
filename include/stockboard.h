@@ -7,14 +7,21 @@
 
 namespace BP
 {
+	//Each sheet for a given type of board
+	struct sheet
+	{
+		double bSheetChop;
+		double bSheetDecal;
+		double bSheetPrice;
+	};
+
     struct stockItem
     {
         std::string sFlute;
         unsigned int sPaperWeight;
         std::string sPaperQuality;
-        double sSheetChop;
-        double sSheetDecal;
-        double sSheetPrice;
+		std::vector<sheet> sheets;
+		std::vector<unsigned int> prices;
     };
 
     class Stockboard
@@ -30,11 +37,12 @@ namespace BP
         void setFlute(std::string fluteIn, unsigned int index);
         void setPaperWeight(std::string weightIn, unsigned int index);
         void setPaperQuality(std::string qualityIn, unsigned int index);
-        void setSheet(std::vector<std::string> sheetIn, unsigned int index);
+        void setBoard(std::vector<std::string> boardIn, unsigned int index);
+		void setPrices(std::vector<std::string> pricesIn, unsigned int index);
         //Read into data structure from file, throw if error
         void readIn(std::string filename);
         //Function to take in flute, weight and quality and check if it's in the structure
-        std::vector<int> getMatches(std::string oFlute,unsigned int oWeight, std::string oQuality);
+        int getBoardMatch(std::string oFlute,unsigned int oWeight, std::string oQuality);
     };
 }
 

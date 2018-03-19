@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>461</width>
-    <height>723</height>
+    <height>728</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2" colspan="2">
+      <item row="0" column="2">
        <widget class="QLabel" name="labelResults">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -543,7 +543,7 @@
        </widget>
       </item>
       <item row="9" column="2">
-       <widget class="QLabel" name="labelInfo">
+       <widget class="QLabel" name="labelPricePer">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -556,7 +556,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Order information:</string>
+         <string>Price per box:</string>
         </property>
        </widget>
       </item>
@@ -606,18 +606,45 @@
         </property>
        </widget>
       </item>
-      <item row="11" column="0" colspan="2">
-       <widget class="QSpinBox" name="spinLength">
+      <item row="10" column="2" colspan="2">
+       <widget class="QLineEdit" name="lineReadPricePer">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="font">
          <font>
           <pointsize>12</pointsize>
          </font>
         </property>
-        <property name="suffix">
-         <string> mm</string>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
         </property>
-        <property name="maximum">
-         <number>1000000</number>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="2">
+       <widget class="QLabel" name="labelInfo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Order information:</string>
         </property>
        </widget>
       </item>
@@ -667,21 +694,6 @@
         </property>
        </widget>
       </item>
-      <item row="13" column="0" colspan="2">
-       <widget class="QSpinBox" name="spinWidth">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="suffix">
-         <string> mm</string>
-        </property>
-        <property name="maximum">
-         <number>1000000</number>
-        </property>
-       </widget>
-      </item>
       <item row="14" column="0">
        <widget class="QLabel" name="labelHeight">
         <property name="sizePolicy">
@@ -725,21 +737,6 @@
         </property>
         <property name="orientation">
          <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="15" column="0" colspan="2">
-       <widget class="QSpinBox" name="spinHeight">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="suffix">
-         <string> mm</string>
-        </property>
-        <property name="maximum">
-         <number>1000000</number>
         </property>
        </widget>
       </item>
@@ -809,18 +806,6 @@
         </property>
        </widget>
       </item>
-      <item row="18" column="0" colspan="2">
-       <widget class="QSpinBox" name="spinQuantity">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="maximum">
-         <number>1000000000</number>
-        </property>
-       </widget>
-      </item>
       <item row="19" column="0">
        <widget class="QLabel" name="labelPPB">
         <property name="sizePolicy">
@@ -864,27 +849,6 @@
         </property>
         <property name="orientation">
          <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="20" column="0" colspan="2">
-       <widget class="QDoubleSpinBox" name="doubleSpinPPB">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="frame">
-         <bool>true</bool>
-        </property>
-        <property name="prefix">
-         <string>£</string>
-        </property>
-        <property name="maximum">
-         <double>1000000.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.300000000000000</double>
         </property>
        </widget>
       </item>
@@ -1002,7 +966,7 @@
         </property>
        </widget>
       </item>
-      <item row="10" column="2" rowspan="11" colspan="2">
+      <item row="12" column="2" rowspan="9" colspan="2">
        <widget class="QTextBrowser" name="textInfo">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -1029,6 +993,84 @@
         </property>
        </widget>
       </item>
+      <item row="11" column="0" colspan="2">
+       <widget class="QSpinBox" name="spinLength">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="maximum">
+         <number>1000000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="0" colspan="2">
+       <widget class="QSpinBox" name="spinWidth">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="maximum">
+         <number>1000000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="15" column="0" colspan="2">
+       <widget class="QSpinBox" name="spinHeight">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="maximum">
+         <number>1000000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="18" column="0" colspan="2">
+       <widget class="QSpinBox" name="spinQuantity">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="maximum">
+         <number>1000000000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="20" column="0" colspan="2">
+       <widget class="QDoubleSpinBox" name="doubleSpinPPB">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+        <property name="prefix">
+         <string>£</string>
+        </property>
+        <property name="maximum">
+         <double>1000000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.300000000000000</double>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item row="1" column="3">
@@ -1038,7 +1080,7 @@
       </property>
       <property name="sizeHint" stdset="0">
        <size>
-        <width>13</width>
+        <width>8</width>
         <height>20</height>
        </size>
       </property>

@@ -42,9 +42,11 @@ namespace BP
         //Outputs:
         double orderCost;
         double customerPrice;
+		double customerPricePer;
         double boxChop;
         double boxDecal;
     public: 
+		//Constructor and destructor
         Order();
         ~Order();
 		//Function to reset to blank
@@ -63,6 +65,7 @@ namespace BP
         //Functions to get output values
         double getOrderCost();
         double getCustomerPrice();
+		double getCustomerPricePer();
         double getBoxChop();
         double getBoxDecal();
         //Functions that calculate and produce information
@@ -70,8 +73,9 @@ namespace BP
         std::string checkSet();
         void doBlankSize();
         void doStockSheet();
+		int getPricingTier();
+		int getCheaperTier();
         void doPricing();
-        std::string generateInformation();
 		double sqMetBox();
 		double sqMetOrder();
 		int quantBoxNeeded();
@@ -89,6 +93,7 @@ namespace BP
         //Functionality if using console
         void consoleDisplay();
         void consoleInput();
+		std::string generateConsoleInformation();
     };
 }
 
