@@ -7,9 +7,9 @@
 namespace BP
 {
 	//Use default values or enter in program
-    #define AUTO 0
-	//Interact with program using console or buttons
-    #define GUI 1
+#define AUTO 0
+//Interact with program using console or buttons
+#define GUI 1
 
 	Order::Order()
 	{
@@ -37,14 +37,14 @@ namespace BP
 			}
 			//Process and return console output:
 			//Check file checking works and return if not
-			try 
+			try
 			{
 				doAllCalculations();
 			}
-			catch(std::invalid_argument &e)
+			catch (std::invalid_argument &e)
 			{
 				//Tell user in console what error is
-				std::cout<<e.what()<<std::endl;
+				std::cout << e.what() << std::endl;
 				return;
 			}
 			//Display output in console
@@ -60,16 +60,37 @@ namespace BP
 
 	void Order::resetAllValues()
 	{
-		flute = "";
-		paperWeight = 0;
-		paperQuality = "";
-		style = "";
+		resetFlute();
+		resetPaperWeight();
+		resetPaperQuality();
+		resetStyle();
 		boxLength = 0;
 		boxWidth = 0;
 		boxHeight = 0;
 		quantity = -1;
 		pricePerBox = 0.30;
 		priceOnTop = 1.5;
+		fullHalfPolicy = 0;
+	}
+
+	void Order::resetFlute()
+	{
+		flute = "";
+	}
+
+	void Order::resetPaperWeight()
+	{
+		paperWeight = 0;
+	}
+
+	void Order::resetPaperQuality()
+	{
+		paperQuality = "";
+	}
+
+	void Order::resetStyle()
+	{
+		style = "";
 	}
 
 	void Order::setFlute(std::string desiredFlute)
@@ -80,7 +101,7 @@ namespace BP
 		}
 		if (desiredFlute.size()==0)
 		{
-			throw std::invalid_argument("Flute selection invalid: entry is empty");
+			throw std::invalid_argument("Flute selection invalid: input empty");
 		}
 		for (unsigned int i=0; i<desiredFlute.size(); i++)
 		{
@@ -97,7 +118,7 @@ namespace BP
 	{
 		if (desiredWeight.size() == 0)
 		{
-			throw std::invalid_argument("Paper Weight selection invalid: entry is empty");
+			throw std::invalid_argument("Paper Weight selection invalid: input empty");
 		}
 		for (unsigned int i=0; i<desiredWeight.size();i++)
 		{
@@ -113,7 +134,7 @@ namespace BP
 	{
 		if (desiredQuality.size() == 0)
 		{
-			throw std::invalid_argument("Paper Quality selection invalid: entry is empty");
+			throw std::invalid_argument("Paper Quality selection invalid: input empty");
 		}
 		for (unsigned int i= 0; i<desiredQuality.size();i++)
 		{
@@ -130,7 +151,7 @@ namespace BP
 	{
 		if (desiredStyle.size() == 0)
 		{
-			throw std::invalid_argument("Style selection invalid: entry is empty");
+			throw std::invalid_argument("Style selection invalid: input empty");
 		}
 		for (unsigned int i = 0; i<desiredStyle.size();i++)
 		{
@@ -219,6 +240,26 @@ namespace BP
 		quantity = std::stoi(desiredQuantity);
 	}
 
+	void Order::setFullHalf(int desiredFullHalf)
+	{
+		if (!checkStyleSet())
+		{
+			throw std::invalid_argument("Full/Half policy selection invalid: Style not set");
+		}
+		if (desiredFullHalf < 0 || desiredFullHalf > 2)
+		{
+			throw std::invalid_argument("Full/Half policy selection invalid: out of range");
+		}
+		if (desiredFullHalf == 1 || desiredFullHalf == 2)
+		{
+			if (!styleHasHalf())
+			{
+				throw std::invalid_argument("Full/Half policy selection invalid: no half chop available");
+			}
+		}
+		fullHalfPolicy = desiredFullHalf;
+	}
+
 	void Order::setPricePerBox(std::string desiredPricePer)
 	{
 		if (desiredPricePer.size() == 0)
@@ -292,6 +333,35 @@ namespace BP
 		return boxDecal;
 	}
 
+	double Order::getSheetChop()
+	{
+		return sheetChop;
+	}
+
+	double Order::getSheetDecal()
+	{
+		return sheetDecal;
+	}
+
+	double Order::getSheetPrice()
+	{
+		return sheetPrice;
+	}
+
+	std::vector<std::string> Order::availableStyles()
+	{
+		std::vector<std::string> styles;
+		for (unsigned int i = 0; i < blanksizes->blanksizeList.size(); i++)
+		{
+			std::string currentStyle = blanksizes->blanksizeList[i].bStyle;
+			if (currentStyle[currentStyle.size() - 1] != 'H')
+			{
+				styles.push_back(currentStyle);
+			}
+		}
+		return styles;
+	}
+
 	void Order::doAllCalculations()
 	{	
 		if (checkSet()!="Passed")
@@ -354,6 +424,14 @@ namespace BP
 		}
 		//Get location in data structure using style and flute
 		unsigned int styleNo = blanksizes->getMatch(style,flute).first;
+		//If this is a half, throw as this should only be on full chop and sets both
+		if (styleNo > 0)
+		{
+			if (blanksizes->blanksizeList[styleNo - 1].bHasHalf == 1)
+			{
+				throw std::invalid_argument("Error with inputted values: cannot choose half chop, change chop policy");
+			}
+		}
 		unsigned int allowanceNo = blanksizes->getMatch(style,flute).second;
 		//Set allowance from data structure
 		allowance = blanksizes->allowanceList[allowanceNo].second;
@@ -363,6 +441,16 @@ namespace BP
 		boxChop += (blanksizes->blanksizeList[styleNo].bParameters[2]*boxHeight);
 		boxChop += blanksizes->blanksizeList[styleNo].bParameters[3];
 		boxChop += (blanksizes->blanksizeList[styleNo].bParameters[4]*allowance);
+		//Set half chop if board has it
+		if (blanksizes->blanksizeList[styleNo].bHasHalf == 1)
+		{
+			unsigned int halfChopStyleNo = styleNo + 1;
+			boxHalfChop = (blanksizes->blanksizeList[halfChopStyleNo].bParameters[0] * boxLength);
+			boxHalfChop += (blanksizes->blanksizeList[halfChopStyleNo].bParameters[1] * boxWidth);
+			boxHalfChop += (blanksizes->blanksizeList[halfChopStyleNo].bParameters[2] * boxHeight);
+			boxHalfChop += blanksizes->blanksizeList[halfChopStyleNo].bParameters[3];
+			boxHalfChop += (blanksizes->blanksizeList[halfChopStyleNo].bParameters[4] * allowance);
+		}
 		//Set decal from data structure
 		boxDecal = (blanksizes->blanksizeList[styleNo].bParameters[5]*boxLength);
 		boxDecal += (blanksizes->blanksizeList[styleNo].bParameters[6]*boxWidth);
@@ -387,47 +475,150 @@ namespace BP
 		//If under 200:
 		if (getPricingTier() == 0)
 		{
-			for (unsigned int i = 0; i < stockboard->theStockboard[match].sheets.size(); i++)
+			//Cheapest if all full or all half chop:
+			if (fullHalfPolicy == 0 || fullHalfPolicy == 1 || fullHalfPolicy == 2)
 			{
-				//Checks for biggest chop - TODO LEAST WASTAGE
-				if (stockboard->theStockboard[match].sheets[i].bSheetChop > cChop)
+				double forseenCost = quantity * stockboard->theStockboard[match].sheets[0].bSheetPrice;
+
+				for (unsigned int i = 0; i < stockboard->theStockboard[match].sheets.size(); i++)
 				{
-					cChop = stockboard->theStockboard[match].sheets[i].bSheetChop;
-					cDecal = stockboard->theStockboard[match].sheets[i].bSheetDecal;
-					cPrice = stockboard->theStockboard[match].sheets[i].bSheetPrice;
+					//Potential chop boxes per sheet is how many can fit horizontally max in this sheet
+					//Worked out depoending on full/half chop policy
+					double potentialCBoxesPerSheet;
+					//Count how many full and half chops
+					int potentialCountFull = 0;
+					int potentialCountHalf = 0;
+					//Potential decal boxes per sheet is how many can fit vertically max in this sheet
+					double potentialDBoxesPerSheet = floor(stockboard->theStockboard[match].sheets[i].bSheetDecal / boxDecal);
+					//If full only policy: potential chop boxes is just how many chops fit in sheet
+					if (fullHalfPolicy == 0)
+					{
+						potentialCBoxesPerSheet = floor(stockboard->theStockboard[match].sheets[i].bSheetChop / boxChop);
+						potentialCountFull = potentialCBoxesPerSheet * potentialDBoxesPerSheet;
+					}
+					//If half only policy: potential chop boxes is just how many half chops fit in sheet
+					else if (fullHalfPolicy == 1)
+					{
+						potentialCBoxesPerSheet = floor(stockboard->theStockboard[match].sheets[i].bSheetChop / boxHalfChop);
+						potentialCountHalf = potentialCBoxesPerSheet * potentialDBoxesPerSheet;
+						potentialCBoxesPerSheet = potentialCBoxesPerSheet / 2;
+					}
+					//If both policy: potential chop boxes is worked out with loop, least wastage
+					else if (fullHalfPolicy == 2)
+					{
+						double boardSize = stockboard->theStockboard[match].sheets[i].bSheetChop;
+						double potentialWastage = boardSize;
+						double calcChopInSheet = stockboard->theStockboard[match].sheets[i].bSheetChop / boxChop;
+						double calcHalfInSheet = stockboard->theStockboard[match].sheets[i].bSheetChop / boxHalfChop;
+						for (unsigned int j = 0; j < ceil(calcChopInSheet); j++)
+						{
+							for (unsigned int k = 0; k < ceil(calcHalfInSheet); k++)
+							{
+								double potentialUsed = (j * boxChop) + (k*boxHalfChop);
+								if (potentialUsed > boardSize)
+								{
+									continue;
+								}
+								double comparedWaste = boardSize - potentialUsed;
+								if (comparedWaste < potentialWastage)
+								{
+									potentialCountHalf = k * potentialDBoxesPerSheet;
+									potentialCountFull = j * potentialDBoxesPerSheet;
+									double K = k;
+									potentialCBoxesPerSheet = j + (K / 2);
+								}
+							}
+						}
+					}
+					if (potentialCBoxesPerSheet == 0 || potentialDBoxesPerSheet == 0)
+					{
+						continue;
+					}
+					double boxesPerSheet = potentialCBoxesPerSheet * potentialDBoxesPerSheet;
+					int noOfSheets = ceil((double)quantity / boxesPerSheet);
+					double potentialCost = noOfSheets * stockboard->theStockboard[match].sheets[i].bSheetPrice;
+					if (potentialCost <= forseenCost)
+					{
+						forseenCost = potentialCost;
+						cChop = stockboard->theStockboard[match].sheets[i].bSheetChop;
+						cDecal = stockboard->theStockboard[match].sheets[i].bSheetDecal;
+						cPrice = stockboard->theStockboard[match].sheets[i].bSheetPrice;
+						cBoxesPerSheet = potentialCBoxesPerSheet;
+						dBoxesPerSheet = potentialDBoxesPerSheet;
+						countFull = potentialCountFull;
+						countHalf = potentialCountHalf;
+					}
 				}
 			}
-			if (cChop < boxChop)
+			if (cChop < 0)
 			{
 				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit " + std::to_string(boxChop));
 			}
-			if (cDecal < boxDecal)
+			if (cDecal < 0)
 			{
 				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has decal big enough to fit " + std::to_string(boxDecal));
 			}
 		}
+		//If pricing done by ordering in board (over 200):
 		else
 		{
-			//Placeholder: TODO ADD PRICING LOGIC
-			for (unsigned int i = 0; i < stockboard->theStockboard[match].sheets.size(); i++)
+			//Sets size of sheet to order accordingly, whichever is smallest: chop or half chop given option
+			cDecal = boxDecal;
+			countHalf = 0;
+			countFull = 0;
+			if (fullHalfPolicy == 0)
 			{
-				//Checks for biggest chop
-				if (stockboard->theStockboard[match].sheets[i].bSheetChop > cChop)
+				cChop = boxChop;
+				countFull = 1;
+			}
+			if (fullHalfPolicy == 1)
+			{
+				cChop = 2*boxHalfChop;
+				countHalf = 2;
+			}
+			if (fullHalfPolicy == 2)
+			{
+				if (2*boxHalfChop < boxChop)
 				{
-					cChop = stockboard->theStockboard[match].sheets[i].bSheetChop;
-					cDecal = stockboard->theStockboard[match].sheets[i].bSheetDecal;
-					cPrice = stockboard->theStockboard[match].sheets[i].bSheetPrice;
+					cChop = 2 * boxHalfChop;
+					countHalf = 2;
+				}
+				else
+				{
+					cChop = boxChop;
+					countFull = 1;
 				}
 			}
-			if (cChop < boxChop)
+			
+			//Pricing is price per square meter * area of box
+			if (getPricingTier() == 200)
 			{
-				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit " + std::to_string(boxChop));
+				cPrice = stockboard->theStockboard[match].prices[0] * ((cDecal*cChop)/1000000000);
 			}
-			if (cDecal < boxDecal)
+			if (getPricingTier() == 500)
 			{
-				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has decal big enough to fit " + std::to_string(boxDecal));
+				cPrice = stockboard->theStockboard[match].prices[1] * ((cDecal*cChop) / 1000000000);
 			}
+			if (getPricingTier() == 1000)
+			{
+				cPrice = stockboard->theStockboard[match].prices[2] * ((cDecal*cChop) / 1000000000);
+			}
+			if (getPricingTier() == 3000)
+			{
+				cPrice = stockboard->theStockboard[match].prices[3] * ((cDecal*cChop) / 1000000000);
+			}
+			if (getPricingTier() == 5000)
+			{
+				cPrice = stockboard->theStockboard[match].prices[4] * ((cDecal*cChop) / 1000000000);
+			}
+			if (getPricingTier() == 10000)
+			{
+				cPrice = stockboard->theStockboard[match].prices[5] * ((cDecal*cChop) / 1000000000);
+			}
+			cBoxesPerSheet = 1;
+			dBoxesPerSheet = 1;
 		}
+		
 		sheetChop = cChop;
 		sheetDecal = cDecal;
 		sheetPrice = cPrice;
@@ -463,6 +654,10 @@ namespace BP
 		{
 			return 0;
 		}
+		else
+		{
+			return -1;
+		}
 	}
 
 	int Order::getCheaperTier()
@@ -496,11 +691,7 @@ namespace BP
 
 	void Order::doPricing()
 	{
-		unsigned int boxCPerSheet = (sheetChop / boxChop);
-		unsigned int boxDPerSheet = (sheetDecal / boxDecal);
-		unsigned int boxPerSheet = boxCPerSheet *boxDPerSheet;
-		int noOfSheets = ceil((double)quantity / boxPerSheet);
-		orderCost = noOfSheets * sheetPrice;
+		orderCost = noOfSheets() * sheetPrice;
 		customerPrice = ((pricePerBox*quantity) + orderCost) * priceOnTop;
 		if (quantity == 0)
 		{
@@ -525,6 +716,46 @@ namespace BP
 	int Order::quantBoxNeeded()
 	{
 		return ceil(getCheaperTier()/ sqMetBox());
+	}
+
+	int Order::noOfSheets()
+	{
+		double boxesPerSheet = cBoxesPerSheet * dBoxesPerSheet;
+		return ceil((double)quantity / boxesPerSheet);
+	}
+
+	bool Order::styleHasHalf()
+	{
+		if (!checkStyleSet())
+		{
+			return 0;
+		}
+		int match = blanksizes->getMatch(style, "").first;
+		if (match == -1)
+		{
+			throw std::invalid_argument("Style selection invalid: not on blanksize.txt");
+			return 0;
+		}
+		else if (blanksizes->blanksizeList[match].bHasHalf == 1)
+		{
+			return 1;
+		}
+		return 0;
+	}
+
+	std::pair<int, int> Order::getChopCounts()
+	{
+		return std::pair<int, int>(countFull/dBoxesPerSheet, countHalf/dBoxesPerSheet);
+	}
+
+	int Order::getDecalCount()
+	{
+		return dBoxesPerSheet;
+	}
+
+	int Order::getPolicy()
+	{
+		return fullHalfPolicy;
 	}
 
 	bool Order::checkFluteSet()
@@ -746,9 +977,26 @@ namespace BP
 	{
 		std::string info = "Square metre of box: " + std::to_string(sqMetBox()) + "\n";
 		info += "Square metre of order: " + std::to_string(sqMetOrder()) + "\n";
+		if (getPricingTier() == 0)
+		{
+			info += "Sheet used's Chop: " + std::to_string(getSheetChop()) + ", Decal: " + std::to_string(getSheetDecal()) + ", Price: " + std::to_string(getSheetPrice()) + ", number of sheets used: " + std::to_string(noOfSheets()) + "\n";
+		}
+		else
+		{
+			info += "Board to order in's Chop: " + std::to_string(getSheetChop()) + ", Decal: " + std::to_string(getSheetDecal()) + ", Price: " + std::to_string(getSheetPrice()) + ", how many to order in: " + std::to_string(noOfSheets()) + "\n";
+		}
+		if (getPolicy() == 0 || getPolicy() == 2)
+		{
+			info += "Number of full chops to fit in sheet: " + std::to_string(getChopCounts().first) + "\n";
+		}
+		if (getPolicy() == 1 || getPolicy() == 2)
+		{
+			info += "Number of half chops to fit in sheet: " + std::to_string(getChopCounts().second) + "\n";
+		}
+		info += "Number of decals to fit in sheet: " + std::to_string(getDecalCount()) + "\n";
 		if (getCheaperTier() != 0)
 		{
-			info += "Minimum quantity of boxes to next pricing tier: " + std::to_string(quantBoxNeeded());
+			info += "Minimum quantity of boxes to next pricing tier: " + std::to_string(quantBoxNeeded()) + "\n";
 		}
 		return info;
 	}

@@ -44,7 +44,7 @@ namespace BP
 
 	void Stockboard::setFlute(std::string fluteIn, unsigned int index)
 	{
-		//Set flute, throw if input is wrong
+		//Set flute, throw if file is wrong
 		for (unsigned int i = 0; i < fluteIn.size(); i++)
 		{
 			if (!isalpha(fluteIn.at(i)))
@@ -58,7 +58,7 @@ namespace BP
 
 	void Stockboard::setPaperWeight(std::string weightIn, unsigned int index)
 	{
-		//Set paper weight, throw if input is wrong
+		//Set paper weight, throw if file is wrong
 		for (unsigned int i = 0; i < weightIn.size(); i++)
 		{
 			if (!isdigit(weightIn.at(i)))
@@ -71,7 +71,7 @@ namespace BP
 
 	void Stockboard::setPaperQuality(std::string qualityIn, unsigned int index)
 	{
-		//Set paper quality, throw if input is wrong
+		//Set paper quality, throw if file is wrong
 		for (unsigned int i = 0; i < qualityIn.size(); i++)
 		{
 			if (!isalpha(qualityIn.at(i)))
@@ -83,18 +83,18 @@ namespace BP
 		theStockboard[index].sPaperQuality = qualityIn;
 	}
 
-	void Stockboard::setBoard(std::vector<std::string> boardIn, unsigned int index)
+	void Stockboard::setSheet(std::vector<std::string> sheetIn, unsigned int index)
 	{
-		//Set sheet info, throw if input is wrong
+		//Set sheet info, throw if file is wrong
 		sheet assigner;
-		for (unsigned int i = 0; i < boardIn.size(); i++)
+		for (unsigned int i = 0; i < sheetIn.size(); i++)
 		{
 			unsigned int dotCount = 0;
-			for (unsigned int j = 0; j < boardIn[i].size(); j++)
+			for (unsigned int j = 0; j < sheetIn[i].size(); j++)
 			{
-				if (!isdigit(boardIn[i].at(j)))
+				if (!isdigit(sheetIn[i].at(j)))
 				{
-					if (boardIn[i].at(j) != '.' || dotCount > 0)
+					if (sheetIn[i].at(j) != '.' || dotCount > 0)
 					{
 						std::string fault;
 						if (i == 0)
@@ -118,15 +118,16 @@ namespace BP
 				}
 			}
 		}
-		assigner.bSheetChop = std::stod(boardIn[0]);
-		assigner.bSheetDecal = std::stod(boardIn[1]);
-		assigner.bSheetPrice = std::stod(boardIn[2]);
+		assigner.bSheetChop = std::stod(sheetIn[0]);
+		assigner.bSheetDecal = std::stod(sheetIn[1]);
+		assigner.bSheetPrice = std::stod(sheetIn[2]);
 		
 		theStockboard[index].sheets.push_back(assigner);
 	}
 
 	void Stockboard::setPrices(std::vector<std::string> pricesIn, unsigned int index)
 	{
+		//Set pricing information, throw if file is wrong
 		std::vector<unsigned int> iVec;
 		for (unsigned int i = 0; i < pricesIn.size(); i++)
 		{
@@ -194,24 +195,24 @@ namespace BP
 				setFlute(vParserS[0], boardsNumber);
 				setPaperWeight(vParserS[1], boardsNumber);
 				setPaperQuality(vParserS[2], boardsNumber);
-				std::vector<std::string> vParserS1;
+				std::vector<std::string> vParserBoards;
 				for (unsigned int i = 0; i < 3; ++i)
 				{
 					stockIn >> parser;
-					vParserS1.push_back(parser);
+					vParserBoards.push_back(parser);
 				}
-				setBoard(vParserS1, boardsNumber);
+				setSheet(vParserBoards, boardsNumber);
 
-				std::vector<std::string> vParserS2;
+				std::vector<std::string> vParserPricing;
 				for (unsigned int i = 0; i < 6; ++i)
 				{
 					stockIn >> parser;
-					vParserS2.push_back(parser);
+					vParserPricing.push_back(parser);
 				}
-				setPrices(vParserS2, boardsNumber);
+				setPrices(vParserPricing, boardsNumber);
 				boardsNumber++;
 			}
-			//If they are no unique, line's sheet info only to the relevant board
+			//If they are no unique, add line's sheet info only to the relevant board type
 			else
 			{
 				std::vector<std::string> vParserS1;
@@ -220,7 +221,7 @@ namespace BP
 					stockIn >> parser;
 					vParserS1.push_back(parser);
 				}
-				setBoard(vParserS1, getBoardMatch(vParserS[0], std::stoi(vParserS[1]), vParserS[2]));
+				setSheet(vParserS1, getBoardMatch(vParserS[0], std::stoi(vParserS[1]), vParserS[2]));
 				getline(stockIn, parser);
 			}
 			//Progress through file
@@ -230,6 +231,7 @@ namespace BP
     
 	int Stockboard::getBoardMatch(std::string oFlute, unsigned int oWeight, std::string oQuality)
     {
+		//Returns index of match in stockboard, -1 if no match
         for (unsigned int i = 0; i < theStockboard.size(); i++)
         {
             bool fluteMatch = 0;

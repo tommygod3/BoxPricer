@@ -31,6 +31,8 @@ namespace BP
         double boxHeight = 0;
         //How many of them to order
         int quantity = -1;
+		//Full/Half/Both
+		int fullHalfPolicy = 0;
         //Pricing info
         double pricePerBox = 0.30;
         double priceOnTop = 1.5;
@@ -39,11 +41,16 @@ namespace BP
         double sheetChop;
         double sheetDecal;
         double sheetPrice;
+		double cBoxesPerSheet;
+		double dBoxesPerSheet;
+		int countFull = 0;
+		int countHalf = 0;
         //Outputs:
         double orderCost;
         double customerPrice;
 		double customerPricePer;
         double boxChop;
+		double boxHalfChop;
         double boxDecal;
     public: 
 		//Constructor and destructor
@@ -51,6 +58,10 @@ namespace BP
         ~Order();
 		//Function to reset to blank
 		void resetAllValues();
+		void resetFlute();
+		void resetPaperWeight();
+		void resetPaperQuality();
+		void resetStyle();
         //Functions to set order values
         void setFlute(std::string desiredFlute);
         void setPaperWeight(std::string desiredWeight);
@@ -60,6 +71,7 @@ namespace BP
         void setBoxWidth(std::string desiredWidth);
         void setBoxHeight(std::string desiredHeight);
         void setQuantity(std::string desiredQuantity);
+		void setFullHalf(int desiredFullHalf);
         void setPricePerBox(std::string desiredPricePer);
         void setPriceOnTop(std::string desiredPriceOnTop);
         //Functions to get output values
@@ -68,6 +80,11 @@ namespace BP
 		double getCustomerPricePer();
         double getBoxChop();
         double getBoxDecal();
+		double getSheetChop();
+		double getSheetDecal();
+		double getSheetPrice();
+		//Functions to return available inputs 
+		std::vector<std::string> availableStyles();
         //Functions that calculate and produce information
         void doAllCalculations();
         std::string checkSet();
@@ -79,6 +96,11 @@ namespace BP
 		double sqMetBox();
 		double sqMetOrder();
 		int quantBoxNeeded();
+		int noOfSheets();
+		bool styleHasHalf();
+		std::pair<int, int> getChopCounts();
+		int getDecalCount();
+		int getPolicy();
 		//Functions that check inputs are set
 		bool checkFluteSet();
 		bool checkPaperWeightSet();

@@ -32,6 +32,7 @@ public slots:
 	void setPOT();
 	void calculateValues();
 	void resetValues();
+	void setFullPolicy();
 };
 
 #endif

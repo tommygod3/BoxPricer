@@ -37,7 +37,7 @@ namespace BP
         void setFlute(std::string fluteIn, unsigned int index);
         void setPaperWeight(std::string weightIn, unsigned int index);
         void setPaperQuality(std::string qualityIn, unsigned int index);
-        void setBoard(std::vector<std::string> boardIn, unsigned int index);
+        void setSheet(std::vector<std::string> SheetIn, unsigned int index);
 		void setPrices(std::vector<std::string> pricesIn, unsigned int index);
         //Read into data structure from file, throw if error
         void readIn(std::string filename);

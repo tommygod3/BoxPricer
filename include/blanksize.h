@@ -13,6 +13,7 @@ namespace BP
     struct blanksize
     {
         std::string bStyle;
+		bool bHasHalf = 0;
         std::vector<double> bParameters;
     };
 

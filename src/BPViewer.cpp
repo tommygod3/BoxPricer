@@ -3,7 +3,7 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	this->setFixedSize(QSize(461, 687));
+	this->setFixedSize(QSize(461, 744));
 	//In distribution folder make sure structured so can get this
 	this->setWindowIcon(QIcon("../resources/box.png"));
 	//Will give error message and close upon start up if order's
@@ -25,13 +25,26 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 	connect(ui.lineEditFlute, SIGNAL(editingFinished()), this, SLOT(setFlute()));
 	connect(ui.lineEditPW, SIGNAL(editingFinished()), this, SLOT(setPW()));
 	connect(ui.lineEditPQ, SIGNAL(editingFinished()), this, SLOT(setPQ()));
-	connect(ui.lineEditStyle, SIGNAL(editingFinished()), this, SLOT(setStyle()));
+	connect(ui.comboBoxStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(setStyle()));
 	connect(ui.spinLength, SIGNAL(editingFinished()), this, SLOT(setLength()));
 	connect(ui.spinWidth, SIGNAL(editingFinished()), this, SLOT(setWidth()));
 	connect(ui.spinHeight, SIGNAL(editingFinished()), this, SLOT(setHeight()));
 	connect(ui.spinQuantity, SIGNAL(editingFinished()), this, SLOT(setQuantity()));
 	connect(ui.doubleSpinPPB, SIGNAL(editingFinished()), this, SLOT(setPPB()));
 	connect(ui.doubleSpinPOT, SIGNAL(editingFinished()), this, SLOT(setPOT()));
+	connect(ui.comboBoxFullHalf, SIGNAL(currentIndexChanged(int)), this, SLOT(setFullPolicy()));
+
+	//Add styles
+	ui.comboBoxStyle->addItem("");
+	std::vector<std::string> styles = order->availableStyles();
+	for (unsigned int i = 0; i < styles.size(); i++)
+	{
+		ui.comboBoxStyle->addItem(QString::fromStdString(styles[i]));
+	}
+	//Add default full chop only option
+	ui.comboBoxFullHalf->addItem("Full Chop Only");
+	
+	
 }
 
 void BPViewer::showMessage(std::string text)
@@ -47,10 +60,33 @@ void BPViewer::showMessage(std::string text)
 	msg.exec();
 }
 
+void BPViewer::setFullPolicy()
+{
+	int index = ui.comboBoxFullHalf->currentIndex();
+	if (index == -1 || !order->checkStyleSet())
+	{
+		return;
+	}
+	try
+	{
+		order->setFullHalf(index);
+	}
+	catch (std::invalid_argument &e)
+	{
+		showMessage(e.what());
+	}
+}
+
 void BPViewer::setFlute()
 {
 	//Get text from label
 	QString inString = ui.lineEditFlute->text();
+	if (inString == "")
+	{
+		ui.tickFlute->setValue(0);
+		order->resetFlute();
+		return;
+	}
 	//Set with converted QString
 	try
 	{
@@ -69,6 +105,12 @@ void BPViewer::setFlute()
 void BPViewer::setPW()
 {
 	QString inString = ui.lineEditPW->text();
+	if (inString == "")
+	{
+		ui.tickPW->setValue(0);
+		order->resetPaperWeight();
+		return;
+	}
 	try
 	{
 		order->setPaperWeight(inString.toStdString());
@@ -83,6 +125,12 @@ void BPViewer::setPW()
 void BPViewer::setPQ()
 {
 	QString inString = ui.lineEditPQ->text();
+	if (inString == "")
+	{
+		ui.tickPQ->setValue(0);
+		order->resetPaperQuality();
+		return;
+	}
 	try
 	{
 		order->setPaperQuality(inString.toStdString());
@@ -96,11 +144,34 @@ void BPViewer::setPQ()
 
 void BPViewer::setStyle()
 {
-	QString inString = ui.lineEditStyle->text();
+	QString styleIn = ui.comboBoxStyle->currentText();
+	if (styleIn == "")
+	{
+		ui.tickStyle->setValue(0);
+		order->resetStyle();
+		ui.comboBoxFullHalf->clear();
+		ui.comboBoxFullHalf->addItem("Full Chop Only");
+		ui.comboBoxFullHalf->setCurrentIndex(0);
+		return;
+	}
 	try
 	{
-		order->setStyle(inString.toStdString());
+		order->setStyle(styleIn.toStdString());
 		ui.tickStyle->setValue(1);
+		if (order->styleHasHalf())
+		{
+			ui.comboBoxFullHalf->clear();
+			ui.comboBoxFullHalf->addItem("Full Chop Only");
+			ui.comboBoxFullHalf->addItem("Half Chop Only");
+			ui.comboBoxFullHalf->addItem("Full and Half Chop");
+			ui.comboBoxFullHalf->setCurrentIndex(0);
+		}
+		else if (!order->styleHasHalf())
+		{
+			ui.comboBoxFullHalf->clear();
+			ui.comboBoxFullHalf->addItem("Full Chop Only");
+			ui.comboBoxFullHalf->setCurrentIndex(0);
+		}
 	}
 	catch (std::invalid_argument &e)
 	{
@@ -240,8 +311,31 @@ void BPViewer::calculateValues()
 	toString = QString(163) + toString;
 	ui.lineReadPricePer->setText(toString);
 
-	toString = "Square metre of box: " + QString::number(order->sqMetBox(),'g',5) + " m" + QChar(0x00B2) + "\n\n";
-	toString += "Square metre of order: " + QString::number(order->sqMetOrder(),'g',5) + " m" + QChar(0x00B2) + "\n\n";
+	toString = "Square metre of box: " + QString::number(order->sqMetBox(),'g',4) + " m" + QChar(0x00B2) + "\n";
+	toString += "Square metre of order: " + QString::number(order->sqMetOrder(),'g',4) + " m" + QChar(0x00B2) + "\n\n";
+	if (order->getPricingTier() == 0)
+	{
+		toString += "Sheet used's info:\nChop: " + QString::number(order->getSheetChop(), 'f', 0) + " mm\n";
+		toString += "Decal: " + QString::number(order->getSheetDecal(), 'f', 0) + " mm\n";
+		toString += "Price per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 2) + "\n";
+		toString += "Number of sheets used: " + QString::number(order->noOfSheets(), 'f', 0) + "\n\n";
+	}
+	else
+	{
+		toString += "Board to order in's info:\nChop: " + QString::number(order->getSheetChop(), 'f', 0) + " mm\n";
+		toString += "Decal: " + QString::number(order->getSheetDecal(), 'f', 0) + " mm\n";
+		toString += "Price per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 2) + "\n";
+		toString += "Number to order in: " + QString::number(order->noOfSheets(), 'f', 0) + "\n\n";
+	}
+	if ((order->getPolicy() == 0 || order->getPolicy() == 2)&&(order->getChopCounts().first != 0))
+	{
+		toString += "Number of full chops per sheet: " + QString::number(order->getChopCounts().first) + "\n";
+	}
+	if (order->getPolicy() == 1 || order->getPolicy() == 2 && (order->getChopCounts().second != 0))
+	{
+		toString += "Number of half chops per sheet: " + QString::number(order->getChopCounts().second) + "\n";
+	}
+	toString += "Number of decals per sheet: " + QString::number(order->getDecalCount()) + "\n\n";
 	if (order->getCheaperTier() != 0)
 	{
 		toString += "Minimum quantity of boxes to next pricing tier: " + QString::number(order->quantBoxNeeded());
@@ -268,7 +362,7 @@ void BPViewer::resetValues()
 		ui.lineEditPQ->setText("");
 		ui.tickPQ->setValue(0);
 
-		ui.lineEditStyle->setText("");
+		ui.comboBoxStyle->setCurrentIndex(0);
 		ui.tickStyle->setValue(0);
 
 		ui.spinLength->setValue(0);
@@ -282,6 +376,11 @@ void BPViewer::resetValues()
 
 		ui.spinQuantity->setValue(0);
 		ui.tickQuantity->setValue(0);
+
+		ui.comboBoxFullHalf->clear();
+		ui.comboBoxFullHalf->addItem("Full Chop Only");
+		ui.comboBoxFullHalf->setCurrentIndex(0);
+		ui.tickFullHalf->setValue(1);
 
 		ui.doubleSpinPPB->setValue(0.30);
 		ui.tickPPB->setValue(1);

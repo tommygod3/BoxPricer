@@ -54,12 +54,19 @@ namespace BP
 
 	void Blanksizes::setStyle(std::string styleIn, unsigned int index)
 	{
-		//Set style, throw if input is wrong
+		//Set style, throw if file is wrong
 		for (unsigned int i = 0; i < styleIn.size(); i++)
 		{
 			if (!isdigit(styleIn.at(i)))
 			{
-				throw std::runtime_error("Error with blanksize file: Style not made of numbers - line " + std::to_string(index + 1));
+				if (i == styleIn.size() - 1 && styleIn.at(i)=='H')
+				{
+					blanksizeList[index - 1].bHasHalf = 1;
+				}
+				else
+				{
+					throw std::runtime_error("Error with blanksize file: Style not made of numbers - line " + std::to_string(index + 1));
+				}
 			}
 			styleIn.at(i) = toupper(styleIn.at(i));
 		}
@@ -68,7 +75,7 @@ namespace BP
 
 	void Blanksizes::setParameters(std::vector<std::string> parametersIn, unsigned int index)
 	{
-		//Set all parameters, throw if input is wrong
+		//Set all parameters, throw if file is wrong
 		std::vector<double> dVec;
 		if (parametersIn.size() != 10)
 		{
@@ -101,7 +108,7 @@ namespace BP
 
 	void Blanksizes::setAllowance(std::vector<std::string> allowanceIn, unsigned int index)
 	{
-		//Set allowance pair, throw if wrong
+		//Set allowance pair, throw if file wrong
 		allowancePair allowanceLine;
 		if (allowanceIn.size() != 2)
 		{
