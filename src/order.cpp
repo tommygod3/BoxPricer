@@ -758,6 +758,34 @@ namespace BP
 		return fullHalfPolicy;
 	}
 
+	std::vector<std::string> Order::getValidInputs(int option)
+	{
+		//Makes copy of blanksize list and removes those not found on allowances
+		std::vector<blanksize> copyList = blanksizes->blanksizeList;
+		std::vector<unsigned int> toRemove;
+		for (unsigned int i = 0 ; i < copyList.size(); i++)
+		{
+			bool match = 0;
+			for (unsigned int j = 0; j < blanksizes->allowanceList.size(); j++)
+			{
+				if (copyList[i].bStyle == blanksizes->allowanceList[j].first)
+				{
+					match = 1;
+				}
+			}
+			if (match == 0)
+			{
+				toRemove.push_back(i);
+			}
+		}
+		std::reverse(toRemove.begin(), toRemove.end());
+		for (unsigned int i = 0; i < toRemove.size(); i++)
+		{
+			copyList.erase(copyList.begin + toRemove[i]);
+		}
+		//TODO - check each 3 inputs set - if they are delete those in copyList that dont match it, at the end if input = 0 return vector<string> flutes, if 1 return vector<string> PWs etc...
+	}
+
 	bool Order::checkFluteSet()
 	{
 		return (flute != "") ? 1 : 0;

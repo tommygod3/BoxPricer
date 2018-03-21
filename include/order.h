@@ -101,6 +101,7 @@ namespace BP
 		std::pair<int, int> getChopCounts();
 		int getDecalCount();
 		int getPolicy();
+		std::vector<std::string> getValidInputs(int option);
 		//Functions that check inputs are set
 		bool checkFluteSet();
 		bool checkPaperWeightSet();

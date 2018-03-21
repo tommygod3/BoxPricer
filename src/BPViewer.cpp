@@ -22,9 +22,9 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 	connect(ui.pushButtonCalc, SIGNAL(clicked()), this, SLOT(calculateValues()));
 	connect(ui.pushButtonReset, SIGNAL(clicked()), this, SLOT(resetValues()));
 
-	connect(ui.lineEditFlute, SIGNAL(editingFinished()), this, SLOT(setFlute()));
-	connect(ui.lineEditPW, SIGNAL(editingFinished()), this, SLOT(setPW()));
-	connect(ui.lineEditPQ, SIGNAL(editingFinished()), this, SLOT(setPQ()));
+	connect(ui.comboBoxFlute, SIGNAL(currentIndexChanged(int)), this, SLOT(setFlute()));
+	connect(ui.comboBoxPW, SIGNAL(currentIndexChanged(int)), this, SLOT(setPW()));
+	connect(ui.comboBoxPQ, SIGNAL(currentIndexChanged(int)), this, SLOT(setPQ()));
 	connect(ui.comboBoxStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(setStyle()));
 	connect(ui.spinLength, SIGNAL(editingFinished()), this, SLOT(setLength()));
 	connect(ui.spinWidth, SIGNAL(editingFinished()), this, SLOT(setWidth()));
@@ -43,8 +43,10 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 	}
 	//Add default full chop only option
 	ui.comboBoxFullHalf->addItem("Full Chop Only");
-	
-	
+	//Add empty on rest
+	ui.comboBoxFlute->addItem("");
+	ui.comboBoxPW->addItem("");
+	ui.comboBoxPQ->addItem("");
 }
 
 void BPViewer::showMessage(std::string text)
@@ -76,6 +78,7 @@ void BPViewer::setFullPolicy()
 		showMessage(e.what());
 	}
 }
+//TODO 3 set functions get vector from getValidInputs, when 1 is set, reset 2 and 3, etc...
 
 void BPViewer::setFlute()
 {
