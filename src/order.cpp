@@ -745,7 +745,7 @@ namespace BP
 
 	std::pair<int, int> Order::getChopCounts()
 	{
-		return std::pair<int, int>(countFull/dBoxesPerSheet, countHalf/dBoxesPerSheet);
+		return std::pair<int, int>(countFull/(int) dBoxesPerSheet, countHalf/(int) dBoxesPerSheet);
 	}
 
 	int Order::getDecalCount()
@@ -760,15 +760,15 @@ namespace BP
 
 	std::vector<std::string> Order::getValidInputs(int option)
 	{
-		//Makes copy of blanksize list and removes those not found on allowances
-		std::vector<blanksize> copyList = blanksizes->blanksizeList;
+		//Makes copy of stockboard list and removes those not found on allowances
+		std::vector<stockItem> copyList = stockboard->theStockboard;
 		std::vector<unsigned int> toRemove;
 		for (unsigned int i = 0 ; i < copyList.size(); i++)
 		{
 			bool match = 0;
 			for (unsigned int j = 0; j < blanksizes->allowanceList.size(); j++)
 			{
-				if (copyList[i].bStyle == blanksizes->allowanceList[j].first)
+				if (copyList[i].sFlute == blanksizes->allowanceList[j].first)
 				{
 					match = 1;
 				}
@@ -781,9 +781,138 @@ namespace BP
 		std::reverse(toRemove.begin(), toRemove.end());
 		for (unsigned int i = 0; i < toRemove.size(); i++)
 		{
-			copyList.erase(copyList.begin + toRemove[i]);
+			copyList.erase(copyList.begin() + toRemove[i]);
 		}
-		//TODO - check each 3 inputs set - if they are delete those in copyList that dont match it, at the end if input = 0 return vector<string> flutes, if 1 return vector<string> PWs etc...
+		if (checkFluteSet())
+		{
+			std::vector<unsigned int> toRemoveFlute;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (copyList[i].sFlute != flute)
+				{
+					toRemoveFlute.push_back(i);
+				}
+			}
+			std::reverse(toRemoveFlute.begin(), toRemoveFlute.end());
+			for (unsigned int i = 0; i < toRemoveFlute.size(); i++)
+			{
+				copyList.erase(copyList.begin() + toRemoveFlute[i]);
+			}
+		}
+		if (checkPaperWeightSet())
+		{
+			std::vector<unsigned int> toRemovePW;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (copyList[i].sPaperWeight != paperWeight)
+				{
+					toRemovePW.push_back(i);
+				}
+			}
+			std::reverse(toRemovePW.begin(), toRemovePW.end());
+			for (unsigned int i = 0; i < toRemovePW.size(); i++)
+			{
+				copyList.erase(copyList.begin() + toRemovePW[i]);
+			}
+		}
+		if (checkPaperQualitySet())
+		{
+			std::vector<unsigned int> toRemovePQ;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (copyList[i].sPaperQuality != paperQuality)
+				{
+					toRemovePQ.push_back(i);
+				}
+			}
+			std::reverse(toRemovePQ.begin(), toRemovePQ.end());
+			for (unsigned int i = 0; i < toRemovePQ.size(); i++)
+			{
+				copyList.erase(copyList.begin() + toRemovePQ[i]);
+			}
+		}
+		if (option == 0)
+		{
+			std::vector<std::string> fluteVec;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (fluteVec.size() == 0)
+				{
+					fluteVec.push_back(copyList[i].sFlute);
+				}
+				else
+				{
+					bool dupe = 0;
+					for (unsigned int j = 0; j < fluteVec.size(); j++)
+					{
+						if (fluteVec[j] == copyList[i].sFlute)
+						{
+							dupe = 1;
+						}
+					}
+					if (dupe == 0)
+					{
+						fluteVec.push_back(copyList[i].sFlute);
+					}
+				}
+			}
+			return fluteVec;
+		}
+		if (option == 1)
+		{
+			std::vector<std::string> PWVec;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (PWVec.size() == 0)
+				{
+					PWVec.push_back(std::to_string(copyList[i].sPaperWeight));
+				}
+				else
+				{
+					bool dupe = 0;
+					for (unsigned int j = 0; j < PWVec.size(); j++)
+					{
+						if (PWVec[j] == std::to_string(copyList[i].sPaperWeight))
+						{
+							dupe = 1;
+						}
+					}
+					if (dupe == 0)
+					{
+						PWVec.push_back(std::to_string(copyList[i].sPaperWeight));
+					}
+				}
+			}
+			return PWVec;
+		}
+		if (option == 2)
+		{
+			std::vector<std::string> PQVec;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (PQVec.size() == 0)
+				{
+					PQVec.push_back(copyList[i].sPaperQuality);
+				}
+				else
+				{
+					bool dupe = 0;
+					for (unsigned int j = 0; j < PQVec.size(); j++)
+					{
+						if (PQVec[j] == copyList[i].sPaperQuality)
+						{
+							dupe = 1;
+						}
+					}
+					if (dupe == 0)
+					{
+						PQVec.push_back(copyList[i].sPaperQuality);
+					}
+				}
+			}
+			return PQVec;
+		}
+		return std::vector<std::string> {};
 	}
 
 	bool Order::checkFluteSet()

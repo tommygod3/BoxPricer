@@ -18,6 +18,9 @@ private:
 	BP::Order* order;
 
 	void showMessage(std::string text);
+	void resetFluteList();
+	void resetPWList();
+	void resetPQList();
 
 public slots:
 	void setFlute();

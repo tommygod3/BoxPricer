@@ -43,10 +43,10 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 	}
 	//Add default full chop only option
 	ui.comboBoxFullHalf->addItem("Full Chop Only");
-	//Add empty on rest
-	ui.comboBoxFlute->addItem("");
-	ui.comboBoxPW->addItem("");
-	ui.comboBoxPQ->addItem("");
+	//TODO: Set up first 3 correctly
+	resetFluteList();
+	resetPWList();
+	resetPQList();
 }
 
 void BPViewer::showMessage(std::string text)
@@ -60,6 +60,39 @@ void BPViewer::showMessage(std::string text)
 	msg.setIconPixmap(QPixmap("../resources/error.png"));
 	msg.setWindowIcon(QIcon("../resources/box.png"));
 	msg.exec();
+}
+
+void BPViewer::resetFluteList()
+{
+	ui.comboBoxFlute->clear();
+	ui.comboBoxFlute->addItem("");
+	std::vector<std::string> fluteVector = order->getValidInputs(0);
+	for (unsigned int i = 0; i < fluteVector.size(); i++)
+	{
+		ui.comboBoxFlute->addItem(QString::fromStdString(fluteVector[i]));
+	}
+}
+
+void BPViewer::resetPWList()
+{
+	ui.comboBoxPW->clear();
+	ui.comboBoxPW->addItem("");
+	std::vector<std::string> PWVector = order->getValidInputs(1);
+	for (unsigned int i = 0; i < PWVector.size(); i++)
+	{
+		ui.comboBoxPW->addItem(QString::fromStdString(PWVector[i]));
+	}
+}
+
+void BPViewer::resetPQList()
+{
+	ui.comboBoxPQ->clear();
+	ui.comboBoxPQ->addItem("");
+	std::vector<std::string> PQVector = order->getValidInputs(2);
+	for (unsigned int i = 0; i < PQVector.size(); i++)
+	{
+		ui.comboBoxPQ->addItem(QString::fromStdString(PQVector[i]));
+	}
 }
 
 void BPViewer::setFullPolicy()
@@ -78,70 +111,108 @@ void BPViewer::setFullPolicy()
 		showMessage(e.what());
 	}
 }
-//TODO 3 set functions get vector from getValidInputs, when 1 is set, reset 2 and 3, etc...
 
+//TODO: 3 set functions get vector from getValidInputs, when 1 is set, reset 2 and 3, etc...
 void BPViewer::setFlute()
 {
-	//Get text from label
-	QString inString = ui.lineEditFlute->text();
-	if (inString == "")
+	QString fluteIn = ui.comboBoxFlute->currentText();
+	if (fluteIn == "" && order->checkFluteSet())
 	{
 		ui.tickFlute->setValue(0);
 		order->resetFlute();
+	}
+	else if (fluteIn == "" && !order->checkFluteSet())
+	{
 		return;
 	}
-	//Set with converted QString
-	try
+	else
 	{
-		order->setFlute(inString.toStdString());
-		ui.tickFlute->setValue(1);
-
+		try
+		{
+			order->setFlute(fluteIn.toStdString());
+			ui.tickFlute->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
-	catch (std::invalid_argument &e)
+	if (!order->checkPaperWeightSet())
 	{
-		showMessage(e.what());
+		resetPWList();
 	}
-	
+	if (!order->checkPaperQualitySet())
+	{
+		resetPQList();
+	}	
 }
 
 
 void BPViewer::setPW()
 {
-	QString inString = ui.lineEditPW->text();
-	if (inString == "")
+	QString PWIn = ui.comboBoxPW->currentText();
+	if (PWIn == "" && order->checkPaperWeightSet())
 	{
 		ui.tickPW->setValue(0);
 		order->resetPaperWeight();
+	}
+	else if (PWIn == "" && !order->checkPaperWeightSet())
+	{
 		return;
 	}
-	try
+	else
 	{
-		order->setPaperWeight(inString.toStdString());
-		ui.tickPW->setValue(1);
+		try
+		{
+			order->setPaperWeight(PWIn.toStdString());
+			ui.tickPW->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
-	catch (std::invalid_argument &e)
+	if (!order->checkFluteSet())
 	{
-		showMessage(e.what());
+		resetFluteList();
+	}
+	if (!order->checkPaperQualitySet())
+	{
+		resetPQList();
 	}
 }
 
 void BPViewer::setPQ()
 {
-	QString inString = ui.lineEditPQ->text();
-	if (inString == "")
+	QString PQIn = ui.comboBoxPQ->currentText();
+	if (PQIn == "" && order->checkPaperQualitySet())
 	{
 		ui.tickPQ->setValue(0);
 		order->resetPaperQuality();
+	}
+	else if (PQIn == "" && !order->checkPaperQualitySet())
+	{
 		return;
 	}
-	try
+	else
 	{
-		order->setPaperQuality(inString.toStdString());
-		ui.tickPQ->setValue(1);
+		try
+		{
+			order->setPaperQuality(PQIn.toStdString());
+			ui.tickPQ->setValue(1);
+		}
+		catch (std::invalid_argument &e)
+		{
+			showMessage(e.what());
+		}
 	}
-	catch (std::invalid_argument &e)
+	if (!order->checkFluteSet())
 	{
-		showMessage(e.what());
+		resetFluteList();
+	}
+	if (!order->checkPaperWeightSet())
+	{
+		resetPWList();
 	}
 }
 
@@ -356,13 +427,13 @@ void BPViewer::resetValues()
 	int ret = resetBox.exec(); 
 	if (ret == QMessageBox::Yes)
 	{
-		ui.lineEditFlute->setText("");
+		ui.comboBoxFlute->setCurrentIndex(0);
 		ui.tickFlute->setValue(0);
 
-		ui.lineEditPW->setText("");
+		ui.comboBoxPW->setCurrentIndex(0);
 		ui.tickPW->setValue(0);
 
-		ui.lineEditPQ->setText("");
+		ui.comboBoxPQ->setCurrentIndex(0);
 		ui.tickPQ->setValue(0);
 
 		ui.comboBoxStyle->setCurrentIndex(0);
@@ -399,5 +470,9 @@ void BPViewer::resetValues()
 		ui.textInfo->setText("");
 
 		order->resetAllValues();
+		//Resets lists
+		resetFluteList();
+		resetPWList();
+		resetPQList();
 	}
 }

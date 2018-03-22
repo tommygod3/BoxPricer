@@ -1164,6 +1164,10 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
+  <tabstop>comboBoxFlute</tabstop>
+  <tabstop>comboBoxPW</tabstop>
+  <tabstop>comboBoxPQ</tabstop>
+  <tabstop>comboBoxStyle</tabstop>
   <tabstop>spinLength</tabstop>
   <tabstop>spinWidth</tabstop>
   <tabstop>spinHeight</tabstop>
