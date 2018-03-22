@@ -8,14 +8,15 @@
 
 namespace BP
 {
-	Stockboard::Stockboard()
+	Stockboard::Stockboard(std::string filepath)
 	{
+		std::string stockboardFilename = "Stockboard.txt";
 		//Resizes vector of stockitems to be of size how many in file
 		//Throws if file does not exist or is bad
-		theStockboard.resize(getLines("../data/Stockboard.txt"));
+		theStockboard.resize(getLines(filepath + stockboardFilename));
 		//Reads file into data structure
 		//Throws if format is wrong
-		readIn("../data/Stockboard.txt");
+		readIn(filepath + stockboardFilename);
 	}
 
 	unsigned int Stockboard::getLines(std::string filename)

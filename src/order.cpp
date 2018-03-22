@@ -14,7 +14,7 @@ namespace BP
 	Order::Order()
 	{
 		blanksizes = new Blanksizes("../data/");
-		stockboard = new Stockboard();
+		stockboard = new Stockboard("../data/");
 		//Uses console input if not using GUI
 		if (!GUI)
 		{

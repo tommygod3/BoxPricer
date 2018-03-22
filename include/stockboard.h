@@ -30,7 +30,7 @@ namespace BP
         //Data structure, list of blinds
         std::vector<stockItem> theStockboard;
         //Functions:
-        Stockboard();
+        Stockboard(std::string filepath);
         //Gets size of file to initialise data structure
         unsigned int getLines(std::string filename);
         //Functions to set members and throw if incorrect
