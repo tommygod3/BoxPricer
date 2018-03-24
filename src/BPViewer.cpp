@@ -405,7 +405,7 @@ void BPViewer::calculateValues()
 	{
 		toString += "Number of full chops per sheet: " + QString::number(order->getChopCounts().first) + "\n";
 	}
-	if (order->getPolicy() == 1 || order->getPolicy() == 2 && (order->getChopCounts().second != 0))
+	if ((order->getPolicy() == 1 || order->getPolicy() == 2) && (order->getChopCounts().second != 0))
 	{
 		toString += "Number of half chops per sheet: " + QString::number(order->getChopCounts().second) + "\n";
 	}
