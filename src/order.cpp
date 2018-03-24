@@ -1,6 +1,8 @@
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
+#include <algorithm>
 
 #include "order.h"
 

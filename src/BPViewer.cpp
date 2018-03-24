@@ -381,7 +381,7 @@ void BPViewer::calculateValues()
 	toString = QString(163) + toString;
 	ui.lineReadPrice->setText(toString);
 
-	toString = QString::number(order->getCustomerPricePer(), 'f', 2);
+	toString = QString::number(order->getCustomerPricePer(), 'f', 10);
 	toString = QString(163) + toString;
 	ui.lineReadPricePer->setText(toString);
 
