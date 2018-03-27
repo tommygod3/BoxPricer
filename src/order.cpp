@@ -405,7 +405,7 @@ namespace BP
 		{
 			copyList.erase(copyList.begin() + toRemove[i]);
 		}
-		if (checkFluteSet())
+		if (checkFluteSet() && (option == 1 || option == 2))
 		{
 			std::vector<unsigned int> toRemoveFlute;
 			for (unsigned int i = 0; i < copyList.size(); i++)
@@ -421,7 +421,7 @@ namespace BP
 				copyList.erase(copyList.begin() + toRemoveFlute[i]);
 			}
 		}
-		if (checkPaperWeightSet())
+		if (checkPaperWeightSet() && (option == 0 || option == 2))
 		{
 			std::vector<unsigned int> toRemovePW;
 			for (unsigned int i = 0; i < copyList.size(); i++)
@@ -437,7 +437,7 @@ namespace BP
 				copyList.erase(copyList.begin() + toRemovePW[i]);
 			}
 		}
-		if (checkPaperQualitySet())
+		if (checkPaperQualitySet() && (option == 0 || option == 1))
 		{
 			std::vector<unsigned int> toRemovePQ;
 			for (unsigned int i = 0; i < copyList.size(); i++)
@@ -478,6 +478,7 @@ namespace BP
 					}
 				}
 			}
+			std::sort(fluteVec.begin(), fluteVec.end());
 			return fluteVec;
 		}
 		if (option == 1)
@@ -505,6 +506,7 @@ namespace BP
 					}
 				}
 			}
+			std::sort(PWVec.begin(), PWVec.end());
 			return PWVec;
 		}
 		if (option == 2)
@@ -532,6 +534,7 @@ namespace BP
 					}
 				}
 			}
+			std::sort(PQVec.begin(), PQVec.end());
 			return PQVec;
 		}
 		return std::vector<std::string> {};
@@ -658,7 +661,7 @@ namespace BP
 		}
 		//Check if sheet instead of box override, override always used over 200 policy even if not 
 		//If under 200:
-		if (getPricingTier() == 0 && !sheetNoBox())
+		if (getPricingTier() == 0)
 		{
 			//Cheapest if all full or all half chop:
 			if (fullHalfPolicy == 0 || fullHalfPolicy == 1 || fullHalfPolicy == 2)
@@ -756,29 +759,42 @@ namespace BP
 		{
 			//Sets size of sheet to order accordingly, whichever is smallest: chop or half chop given option
 			cDecal = boxDecal;
+			cChop = 0;
 			countHalf = 0;
 			countFull = 0;
 			if (fullHalfPolicy == 0)
 			{
-				cChop = boxChop;
-				countFull = 1;
+				while (cChop < 600)
+				{
+					cChop += boxChop;
+					countFull++;
+				}
 			}
 			if (fullHalfPolicy == 1)
 			{
-				cChop = 2*boxHalfChop;
-				countHalf = 2;
+				while (cChop < 600)
+				{
+					cChop += boxHalfChop;
+					countHalf++;
+				}
 			}
 			if (fullHalfPolicy == 2)
 			{
 				if (2*boxHalfChop < boxChop)
 				{
-					cChop = 2 * boxHalfChop;
-					countHalf = 2;
+					while (cChop < 600)
+					{
+						cChop += boxHalfChop;
+						countHalf++;
+					}
 				}
 				else
 				{
-					cChop = boxChop;
-					countFull = 1;
+					while (cChop < 600)
+					{
+						cChop += boxChop;
+						countFull++;
+					}
 				}
 			}
 			
