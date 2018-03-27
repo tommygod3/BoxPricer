@@ -73,6 +73,7 @@ namespace BP
 		pricePerBox = 0.30;
 		priceOnTop = 1.5;
 		fullHalfPolicy = 0;
+		forceSheets = 0;
 	}
 
 	void Order::resetFlute()
@@ -310,6 +311,15 @@ namespace BP
 		priceOnTop = std::stod(desiredPriceOnTop);
 	}
 
+	void Order::setForceSheets(bool value)
+	{
+		//Potential temp solution for rushing
+		//Sheets only and no ordering in
+		//Maybe replace with 2 output columns
+		//One using sheets one ordering in
+		forceSheets = value;
+	}
+
 	double Order::getOrderCost()
 	{
 		return orderCost;
@@ -361,7 +371,165 @@ namespace BP
 				styles.push_back(currentStyle);
 			}
 		}
+		styles.push_back("0");
 		return styles;
+	}
+
+	std::vector<std::string> Order::getValidInputs(int option)
+	{
+		//Makes copy of stockboard list and removes those not found on allowances
+		std::vector<stockItem> copyList = stockboard->theStockboard;
+		std::vector<unsigned int> toRemove;
+		for (unsigned int i = 0; i < copyList.size(); i++)
+		{
+			bool match = 0;
+			for (unsigned int j = 0; j < blanksizes->allowanceList.size(); j++)
+			{
+				if (copyList[i].sFlute == blanksizes->allowanceList[j].first)
+				{
+					match = 1;
+				}
+			}
+			if (match == 0)
+			{
+				toRemove.push_back(i);
+			}
+		}
+		std::reverse(toRemove.begin(), toRemove.end());
+		for (unsigned int i = 0; i < toRemove.size(); i++)
+		{
+			copyList.erase(copyList.begin() + toRemove[i]);
+		}
+		if (checkFluteSet())
+		{
+			std::vector<unsigned int> toRemoveFlute;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (copyList[i].sFlute != flute)
+				{
+					toRemoveFlute.push_back(i);
+				}
+			}
+			std::reverse(toRemoveFlute.begin(), toRemoveFlute.end());
+			for (unsigned int i = 0; i < toRemoveFlute.size(); i++)
+			{
+				copyList.erase(copyList.begin() + toRemoveFlute[i]);
+			}
+		}
+		if (checkPaperWeightSet())
+		{
+			std::vector<unsigned int> toRemovePW;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (copyList[i].sPaperWeight != paperWeight)
+				{
+					toRemovePW.push_back(i);
+				}
+			}
+			std::reverse(toRemovePW.begin(), toRemovePW.end());
+			for (unsigned int i = 0; i < toRemovePW.size(); i++)
+			{
+				copyList.erase(copyList.begin() + toRemovePW[i]);
+			}
+		}
+		if (checkPaperQualitySet())
+		{
+			std::vector<unsigned int> toRemovePQ;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (copyList[i].sPaperQuality != paperQuality)
+				{
+					toRemovePQ.push_back(i);
+				}
+			}
+			std::reverse(toRemovePQ.begin(), toRemovePQ.end());
+			for (unsigned int i = 0; i < toRemovePQ.size(); i++)
+			{
+				copyList.erase(copyList.begin() + toRemovePQ[i]);
+			}
+		}
+		if (option == 0)
+		{
+			std::vector<std::string> fluteVec;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (fluteVec.size() == 0)
+				{
+					fluteVec.push_back(copyList[i].sFlute);
+				}
+				else
+				{
+					bool dupe = 0;
+					for (unsigned int j = 0; j < fluteVec.size(); j++)
+					{
+						if (fluteVec[j] == copyList[i].sFlute)
+						{
+							dupe = 1;
+						}
+					}
+					if (dupe == 0)
+					{
+						fluteVec.push_back(copyList[i].sFlute);
+					}
+				}
+			}
+			return fluteVec;
+		}
+		if (option == 1)
+		{
+			std::vector<std::string> PWVec;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (PWVec.size() == 0)
+				{
+					PWVec.push_back(std::to_string(copyList[i].sPaperWeight));
+				}
+				else
+				{
+					bool dupe = 0;
+					for (unsigned int j = 0; j < PWVec.size(); j++)
+					{
+						if (PWVec[j] == std::to_string(copyList[i].sPaperWeight))
+						{
+							dupe = 1;
+						}
+					}
+					if (dupe == 0)
+					{
+						PWVec.push_back(std::to_string(copyList[i].sPaperWeight));
+					}
+				}
+			}
+			return PWVec;
+		}
+		if (option == 2)
+		{
+			std::vector<std::string> PQVec;
+			for (unsigned int i = 0; i < copyList.size(); i++)
+			{
+				if (PQVec.size() == 0)
+				{
+					PQVec.push_back(copyList[i].sPaperQuality);
+				}
+				else
+				{
+					bool dupe = 0;
+					for (unsigned int j = 0; j < PQVec.size(); j++)
+					{
+						if (PQVec[j] == copyList[i].sPaperQuality)
+						{
+							dupe = 1;
+						}
+					}
+					if (dupe == 0)
+					{
+						PQVec.push_back(copyList[i].sPaperQuality);
+					}
+				}
+			}
+			return PQVec;
+		}
+		return std::vector<std::string> {};
 	}
 
 	void Order::doAllCalculations()
@@ -414,6 +582,15 @@ namespace BP
 
 	void Order::doBlankSize()
 	{
+		//Temp sheet only override
+		if (sheetNoBox())
+		{
+			boxChop = boxLength;
+			boxDecal = boxWidth;
+			sheetChop = boxChop;
+			sheetDecal = boxDecal;
+			return;
+		}
 		//Using blanksize structure:
 		//Throws if inputs not found in file
 		if (blanksizes->getMatch(style,flute).first<0)
@@ -473,6 +650,12 @@ namespace BP
 		if (match == -1)
 		{
 			throw std::invalid_argument("Error with inputted values: no match found for Flute, Paper Weight and Paper Quality in Stockboard file");
+		}
+		//Check if sheet instead of box override
+		//If not above 200 square metres tell user - if not action normally on over 200 tier - sheet dimensions are set to the box dimensions in blanksizes
+		if (sheetNoBox() && getPricingTier() == 0)
+		{
+			throw std::invalid_argument("Cannot use sheet only option when order's square meterage is below 200, quantity of sheets to get to 200 square metres: " + std::to_string(quantBoxNeeded()));
 		}
 		//If under 200:
 		if (getPricingTier() == 0)
@@ -628,6 +811,10 @@ namespace BP
 	
 	int Order::getPricingTier()
 	{
+		if (forceSheets)
+		{
+			return 0;
+		}
 		if (sqMetOrder() >= 10000)
 		{
 			return 10000;
@@ -728,7 +915,8 @@ namespace BP
 
 	bool Order::styleHasHalf()
 	{
-		if (!checkStyleSet())
+		//No half if not set or sheet only override
+		if (!checkStyleSet() || sheetNoBox())
 		{
 			return 0;
 		}
@@ -760,161 +948,16 @@ namespace BP
 		return fullHalfPolicy;
 	}
 
-	std::vector<std::string> Order::getValidInputs(int option)
+	bool Order::sheetNoBox()
 	{
-		//Makes copy of stockboard list and removes those not found on allowances
-		std::vector<stockItem> copyList = stockboard->theStockboard;
-		std::vector<unsigned int> toRemove;
-		for (unsigned int i = 0 ; i < copyList.size(); i++)
+		//Temp workaround override:
+		//Style as 0 means that not using a box, using sheet
+		//Length is its chop and width decal
+		if (style == "0")
 		{
-			bool match = 0;
-			for (unsigned int j = 0; j < blanksizes->allowanceList.size(); j++)
-			{
-				if (copyList[i].sFlute == blanksizes->allowanceList[j].first)
-				{
-					match = 1;
-				}
-			}
-			if (match == 0)
-			{
-				toRemove.push_back(i);
-			}
+			return 1;
 		}
-		std::reverse(toRemove.begin(), toRemove.end());
-		for (unsigned int i = 0; i < toRemove.size(); i++)
-		{
-			copyList.erase(copyList.begin() + toRemove[i]);
-		}
-		if (checkFluteSet())
-		{
-			std::vector<unsigned int> toRemoveFlute;
-			for (unsigned int i = 0; i < copyList.size(); i++)
-			{
-				if (copyList[i].sFlute != flute)
-				{
-					toRemoveFlute.push_back(i);
-				}
-			}
-			std::reverse(toRemoveFlute.begin(), toRemoveFlute.end());
-			for (unsigned int i = 0; i < toRemoveFlute.size(); i++)
-			{
-				copyList.erase(copyList.begin() + toRemoveFlute[i]);
-			}
-		}
-		if (checkPaperWeightSet())
-		{
-			std::vector<unsigned int> toRemovePW;
-			for (unsigned int i = 0; i < copyList.size(); i++)
-			{
-				if (copyList[i].sPaperWeight != paperWeight)
-				{
-					toRemovePW.push_back(i);
-				}
-			}
-			std::reverse(toRemovePW.begin(), toRemovePW.end());
-			for (unsigned int i = 0; i < toRemovePW.size(); i++)
-			{
-				copyList.erase(copyList.begin() + toRemovePW[i]);
-			}
-		}
-		if (checkPaperQualitySet())
-		{
-			std::vector<unsigned int> toRemovePQ;
-			for (unsigned int i = 0; i < copyList.size(); i++)
-			{
-				if (copyList[i].sPaperQuality != paperQuality)
-				{
-					toRemovePQ.push_back(i);
-				}
-			}
-			std::reverse(toRemovePQ.begin(), toRemovePQ.end());
-			for (unsigned int i = 0; i < toRemovePQ.size(); i++)
-			{
-				copyList.erase(copyList.begin() + toRemovePQ[i]);
-			}
-		}
-		if (option == 0)
-		{
-			std::vector<std::string> fluteVec;
-			for (unsigned int i = 0; i < copyList.size(); i++)
-			{
-				if (fluteVec.size() == 0)
-				{
-					fluteVec.push_back(copyList[i].sFlute);
-				}
-				else
-				{
-					bool dupe = 0;
-					for (unsigned int j = 0; j < fluteVec.size(); j++)
-					{
-						if (fluteVec[j] == copyList[i].sFlute)
-						{
-							dupe = 1;
-						}
-					}
-					if (dupe == 0)
-					{
-						fluteVec.push_back(copyList[i].sFlute);
-					}
-				}
-			}
-			return fluteVec;
-		}
-		if (option == 1)
-		{
-			std::vector<std::string> PWVec;
-			for (unsigned int i = 0; i < copyList.size(); i++)
-			{
-				if (PWVec.size() == 0)
-				{
-					PWVec.push_back(std::to_string(copyList[i].sPaperWeight));
-				}
-				else
-				{
-					bool dupe = 0;
-					for (unsigned int j = 0; j < PWVec.size(); j++)
-					{
-						if (PWVec[j] == std::to_string(copyList[i].sPaperWeight))
-						{
-							dupe = 1;
-						}
-					}
-					if (dupe == 0)
-					{
-						PWVec.push_back(std::to_string(copyList[i].sPaperWeight));
-					}
-				}
-			}
-			return PWVec;
-		}
-		if (option == 2)
-		{
-			std::vector<std::string> PQVec;
-			for (unsigned int i = 0; i < copyList.size(); i++)
-			{
-				if (PQVec.size() == 0)
-				{
-					PQVec.push_back(copyList[i].sPaperQuality);
-				}
-				else
-				{
-					bool dupe = 0;
-					for (unsigned int j = 0; j < PQVec.size(); j++)
-					{
-						if (PQVec[j] == copyList[i].sPaperQuality)
-						{
-							dupe = 1;
-						}
-					}
-					if (dupe == 0)
-					{
-						PQVec.push_back(copyList[i].sPaperQuality);
-					}
-				}
-			}
-			return PQVec;
-		}
-		return std::vector<std::string> {};
+		return 0;
 	}
 
 	bool Order::checkFluteSet()

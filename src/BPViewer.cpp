@@ -3,9 +3,9 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	this->setFixedSize(QSize(461, 744));
+	this->setFixedSize(QSize(447, 771));
 	//In distribution folder make sure structured so can get this
-	this->setWindowIcon(QIcon("../resources/box.png"));
+	this->setWindowIcon(QIcon("../resources/boxpic.png"));
 	//Will give error message and close upon start up if order's
 	//construction throws because missing data file
 	try
@@ -33,6 +33,7 @@ BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 	connect(ui.doubleSpinPPB, SIGNAL(editingFinished()), this, SLOT(setPPB()));
 	connect(ui.doubleSpinPOT, SIGNAL(editingFinished()), this, SLOT(setPOT()));
 	connect(ui.comboBoxFullHalf, SIGNAL(currentIndexChanged(int)), this, SLOT(setFullPolicy()));
+	connect(ui.radioButtonRush, SIGNAL(clicked()), this, SLOT(setForceSheets()));
 
 	//Add styles
 	ui.comboBoxStyle->addItem("");
@@ -58,7 +59,7 @@ void BPViewer::showMessage(std::string text)
 	msg.setInformativeText(message);
 	//In distribution folder make sure structured so can get this
 	msg.setIconPixmap(QPixmap("../resources/error.png"));
-	msg.setWindowIcon(QIcon("../resources/box.png"));
+	msg.setWindowIcon(QIcon("../resources/boxpic.png"));
 	msg.exec();
 }
 
@@ -251,6 +252,17 @@ void BPViewer::setStyle()
 	{
 		showMessage(e.what());
 	}
+	//Override check:
+	if (styleIn == "0")
+	{
+		order->setBoxHeight("1");
+		ui.tickHeight->setValue(1);
+		QMessageBox msg;
+		msg.setText("Warning");
+		msg.setInformativeText("Using sheet override: Length will be interpreted as Chop and Width as Decal, Height will be ignored.");
+		msg.setWindowIcon(QIcon("../resources/boxpic.png"));
+		msg.exec();
+	}
 }
 
 void BPViewer::setLength()
@@ -353,6 +365,12 @@ void BPViewer::setPOT()
 	}
 }
 
+void BPViewer::setForceSheets()
+{
+	bool valueIn = ui.radioButtonRush->isChecked();
+	order->setForceSheets(valueIn);
+}
+
 void BPViewer::calculateValues()
 {
 	try
@@ -415,12 +433,17 @@ void BPViewer::calculateValues()
 		toString += "Minimum quantity of boxes to next pricing tier: " + QString::number(order->quantBoxNeeded());
 	}
 	ui.textInfo->setText(toString);
+	//Style only override check:
+	if (order->sheetNoBox())
+	{
+		ui.textInfo->setText("");
+	}
 }
 
 void BPViewer::resetValues()
 {
 	QMessageBox resetBox;
-	resetBox.setWindowIcon(QIcon("../resources/box.png"));
+	resetBox.setWindowIcon(QIcon("../resources/boxpic.png"));
 	resetBox.setText("Are you sure you want to reset all values?");
 	resetBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 	resetBox.setDefaultButton(QMessageBox::No);
@@ -461,6 +484,8 @@ void BPViewer::resetValues()
 
 		ui.doubleSpinPOT->setValue(1.50);
 		ui.tickPOT->setValue(1);
+
+		ui.radioButtonRush->setChecked(0);
 
 		ui.lineReadChop->setText("");
 		ui.lineReadDecal->setText("");

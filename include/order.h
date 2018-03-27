@@ -33,6 +33,8 @@ namespace BP
         int quantity = -1;
 		//Full/Half/Both
 		int fullHalfPolicy = 0;
+		//Normal or forcing sheets only
+		bool forceSheets = 0;
         //Pricing info
         double pricePerBox = 0.30;
         double priceOnTop = 1.5;
@@ -74,6 +76,7 @@ namespace BP
 		void setFullHalf(int desiredFullHalf);
         void setPricePerBox(std::string desiredPricePer);
         void setPriceOnTop(std::string desiredPriceOnTop);
+		void setForceSheets(bool value);
         //Functions to get output values
         double getOrderCost();
         double getCustomerPrice();
@@ -85,6 +88,7 @@ namespace BP
 		double getSheetPrice();
 		//Functions to return available inputs 
 		std::vector<std::string> availableStyles();
+		std::vector<std::string> getValidInputs(int option);
         //Functions that calculate and produce information
         void doAllCalculations();
         std::string checkSet();
@@ -101,7 +105,8 @@ namespace BP
 		std::pair<int, int> getChopCounts();
 		int getDecalCount();
 		int getPolicy();
-		std::vector<std::string> getValidInputs(int option);
+		//Temp work around for sheet instead of box
+		bool sheetNoBox();
 		//Functions that check inputs are set
 		bool checkFluteSet();
 		bool checkPaperWeightSet();
