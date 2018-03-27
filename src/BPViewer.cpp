@@ -3,7 +3,7 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	this->setFixedSize(QSize(447, 771));
+	this->setFixedSize(QSize(533, 764));
 	//In distribution folder make sure structured so can get this
 	this->setWindowIcon(QIcon("../resources/boxpic.png"));
 	//Will give error message and close upon start up if order's
@@ -382,10 +382,24 @@ void BPViewer::calculateValues()
 		showMessage(e.what());
 		return;
 	}
-	//Set:
-	QString toString = QString::number(order->getBoxChop());
-	toString += " mm";
+	//Reset full and half as sometimes empty
+	QString toString = "";
 	ui.lineReadChop->setText(toString);
+	ui.lineReadHalfChop->setText(toString);
+	//Set:
+	if (order->getChopCounts().first > 0)
+	{
+		toString = QString::number(order->getBoxChop());
+		toString += " mm";
+		ui.lineReadChop->setText(toString);
+	}
+	
+	if (order->getChopCounts().second > 0)
+	{
+		toString = QString::number(order->getBoxHalfChop());
+		toString += " mm";
+		ui.lineReadHalfChop->setText(toString);
+	}
 
 	toString = QString::number(order->getBoxDecal());
 	toString += " mm";
@@ -488,6 +502,7 @@ void BPViewer::resetValues()
 		ui.radioButtonRush->setChecked(0);
 
 		ui.lineReadChop->setText("");
+		ui.lineReadHalfChop->setText("");
 		ui.lineReadDecal->setText("");
 		ui.lineReadCost->setText("");
 		ui.lineReadPrice->setText("");

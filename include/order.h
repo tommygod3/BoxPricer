@@ -82,6 +82,7 @@ namespace BP
         double getCustomerPrice();
 		double getCustomerPricePer();
         double getBoxChop();
+		double getBoxHalfChop();
         double getBoxDecal();
 		double getSheetChop();
 		double getSheetDecal();

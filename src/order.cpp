@@ -340,6 +340,11 @@ namespace BP
 		return boxChop;
 	}
 
+	double Order::getBoxHalfChop()
+	{
+		return boxHalfChop;
+	}
+
 	double Order::getBoxDecal()
 	{
 		return boxDecal;
@@ -651,19 +656,14 @@ namespace BP
 		{
 			throw std::invalid_argument("Error with inputted values: no match found for Flute, Paper Weight and Paper Quality in Stockboard file");
 		}
-		//Check if sheet instead of box override
-		//If not above 200 square metres tell user - if not action normally on over 200 tier - sheet dimensions are set to the box dimensions in blanksizes
-		if (sheetNoBox() && getPricingTier() == 0)
-		{
-			throw std::invalid_argument("Cannot use sheet only option when order's square meterage is below 200, quantity of sheets to get to 200 square metres: " + std::to_string(quantBoxNeeded()));
-		}
+		//Check if sheet instead of box override, override always used over 200 policy even if not 
 		//If under 200:
-		if (getPricingTier() == 0)
+		if (getPricingTier() == 0 && !sheetNoBox())
 		{
 			//Cheapest if all full or all half chop:
 			if (fullHalfPolicy == 0 || fullHalfPolicy == 1 || fullHalfPolicy == 2)
 			{
-				double forseenCost = quantity * stockboard->theStockboard[match].sheets[0].bSheetPrice;
+				double forseenCost = 2 * quantity * stockboard->theStockboard[match].sheets[0].bSheetPrice;
 
 				for (unsigned int i = 0; i < stockboard->theStockboard[match].sheets.size(); i++)
 				{
@@ -737,7 +737,14 @@ namespace BP
 			}
 			if (cChop < 0)
 			{
-				throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit " + std::to_string(boxChop));
+				if (fullHalfPolicy == 0)
+				{
+					throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit box chop of " + std::to_string(boxChop));
+				}
+				if (fullHalfPolicy == 1 || fullHalfPolicy == 2)
+				{
+					throw std::invalid_argument("Error with inputted values: no matched sheet in Stockboard file has chop big enough to fit box half chop of " + std::to_string(boxHalfChop));
+				}
 			}
 			if (cDecal < 0)
 			{
