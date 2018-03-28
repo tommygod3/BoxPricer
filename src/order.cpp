@@ -823,10 +823,11 @@ namespace BP
 			{
 				cPrice = stockboard->theStockboard[match].prices[5] * ((cDecal*cChop) / 1000000000);
 			}
-			cBoxesPerSheet = 1;
+			cBoxesPerSheet = (countHalf*0.5)+(countFull);
 			dBoxesPerSheet = 1;
+			countFull = countFull * dBoxesPerSheet;
+			countHalf = countHalf * dBoxesPerSheet;
 		}
-		
 		sheetChop = cChop;
 		sheetDecal = cDecal;
 		sheetPrice = cPrice;
@@ -958,6 +959,8 @@ namespace BP
 
 	std::pair<int, int> Order::getChopCounts()
 	{
+		//countFull is number of full chops on sheet, cBoxesPerSheet is number of boxes per sheet across
+		//Return value first is number of full chops across
 		return std::pair<int, int>(countFull/(int) dBoxesPerSheet, countHalf/(int) dBoxesPerSheet);
 	}
 
