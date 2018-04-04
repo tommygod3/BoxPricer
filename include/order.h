@@ -49,6 +49,7 @@ namespace BP
 		int countHalf = 0;
         //Outputs:
         double orderCost;
+		double orderCostPer;
         double customerPrice;
 		double customerPricePer;
         double boxChop;
@@ -79,6 +80,7 @@ namespace BP
 		void setForceSheets(bool value);
         //Functions to get output values
         double getOrderCost();
+		double getOrderCostPer();
         double getCustomerPrice();
 		double getCustomerPricePer();
         double getBoxChop();

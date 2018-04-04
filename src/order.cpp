@@ -325,6 +325,11 @@ namespace BP
 		return orderCost;
 	}
 
+	double Order::getOrderCostPer()
+	{
+		return orderCostPer;
+	}
+
 	double Order::getCustomerPrice()
 	{
 		return customerPrice;
@@ -909,10 +914,12 @@ namespace BP
 		if (quantity == 0)
 		{
 			customerPricePer = 0;
+			orderCostPer = 0;
 		}
 		else
 		{
 			customerPricePer = customerPrice / quantity;
+			orderCostPer = orderCost / quantity;
 		}
 	}
 

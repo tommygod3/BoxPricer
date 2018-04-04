@@ -3,7 +3,17 @@
 BPViewer::BPViewer(QWidget *parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	this->setFixedSize(QSize(533, 764));
+	//Make sure size right
+	QRect rec = QApplication::desktop()->screenGeometry();
+	int height = rec.height();
+	if (height > 800)
+	{
+		this->setFixedSize(QSize(533, 763));
+	}
+	else
+	{
+		this->setFixedSize(QSize(533, ((height*9)/ 10)));
+	}
 	//In distribution folder make sure structured so can get this
 	this->setWindowIcon(QIcon("../resources/boxpic.png"));
 	//Will give error message and close upon start up if order's
@@ -437,32 +447,33 @@ void BPViewer::calculateValues()
 	toString += " mm";
 	ui.lineReadDecal->setText(toString);
 
-	toString = QString::number(order->getOrderCost(),'f',2);
+	toString = QString::number(order->getOrderCost(),'f',3);
 	toString = QString(163) + toString;
 	ui.lineReadCost->setText(toString);
 
-	toString = QString::number(order->getCustomerPrice(),'f',2);
+	toString = QString::number(order->getCustomerPrice(),'f',3);
 	toString = QString(163) + toString;
 	ui.lineReadPrice->setText(toString);
 
-	toString = QString::number(order->getCustomerPricePer(), 'f', 10);
+	toString = QString::number(order->getCustomerPricePer(), 'f', 3);
 	toString = QString(163) + toString;
 	ui.lineReadPricePer->setText(toString);
 
-	toString = "Square metre of box: " + QString::number(order->sqMetBox(),'g',4) + " m" + QChar(0x00B2) + "\n";
-	toString += "Square metre of order: " + QString::number(order->sqMetOrder(),'g',4) + " m" + QChar(0x00B2) + "\n\n";
+	toString = "Square metre of box: " + QString::number(order->sqMetBox(), 'f', 3) + " m" + QChar(0x00B2) + "\n";
+	toString += "Square metre of order: " + QString::number(order->sqMetOrder(), 'f', 3) + " m" + QChar(0x00B2) + "\n\n";
+	toString += "Cost per box: " + QString(163) + QString::number(order->getOrderCostPer(), 'f', 3) + "\n\n";
 	if (order->getPricingTier() == 0)
 	{
 		toString += "Sheet used's info:\nChop: " + QString::number(order->getSheetChop(), 'f', 0) + " mm\n";
 		toString += "Decal: " + QString::number(order->getSheetDecal(), 'f', 0) + " mm\n";
-		toString += "Cost per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 5) + "\n";
+		toString += "Cost per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 3) + "\n";
 		toString += "Number of sheets used: " + QString::number(order->noOfSheets(), 'f', 0) + "\n\n";
 	}
 	else
 	{
 		toString += "Board to order in's info:\nChop: " + QString::number(order->getSheetChop(), 'f', 0) + " mm\n";
 		toString += "Decal: " + QString::number(order->getSheetDecal(), 'f', 0) + " mm\n";
-		toString += "Cost per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 5) + "\n";
+		toString += "Cost per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 3) + "\n";
 		toString += "Number to order in: " + QString::number(order->noOfSheets(), 'f', 0) + "\n\n";
 	}
 	if ((order->getPolicy() == 0 || order->getPolicy() == 2)&&(order->getChopCounts().first != 0))
@@ -481,20 +492,20 @@ void BPViewer::calculateValues()
 	//Style only override check:
 	if (order->sheetNoBox())
 	{
-		toString = "Square metre of sheet: " + QString::number(order->sqMetBox(), 'g', 4) + " m" + QChar(0x00B2) + "\n";
-		toString += "Square metre of order: " + QString::number(order->sqMetOrder(), 'g', 4) + " m" + QChar(0x00B2) + "\n\n";
+		toString = "Square metre of sheet: " + QString::number(order->sqMetBox(), 'f', 3) + " m" + QChar(0x00B2) + "\n";
+		toString += "Square metre of order: " + QString::number(order->sqMetOrder(), 'f', 3) + " m" + QChar(0x00B2) + "\n\n";
 		if (order->getPricingTier() == 0)
 		{
 			toString += "Sheet used's info:\nChop: " + QString::number(order->getSheetChop(), 'f', 0) + " mm\n";
 			toString += "Decal: " + QString::number(order->getSheetDecal(), 'f', 0) + " mm\n";
-			toString += "Cost per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 5) + "\n";
+			toString += "Cost per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 3) + "\n";
 			toString += "Number of sheets used: " + QString::number(order->noOfSheets(), 'f', 0) + "\n\n";
 		}
 		else
 		{
 			toString += "Board to order in's info:\nChop: " + QString::number(order->getSheetChop(), 'f', 0) + " mm\n";
 			toString += "Decal: " + QString::number(order->getSheetDecal(), 'f', 0) + " mm\n";
-			toString += "Cost per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 5) + "\n";
+			toString += "Cost per sheet: " + QString(163) + QString::number(order->getSheetPrice(), 'f', 3) + "\n";
 			toString += "Number to order in: " + QString::number(order->noOfSheets(), 'f', 0) + "\n\n";
 		}
 		if (order->getCheaperTier() != 0)
