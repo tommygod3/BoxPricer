@@ -213,7 +213,7 @@ namespace BP
 				setPrices(vParserPricing, boardsNumber);
 				boardsNumber++;
 			}
-			//If they are no unique, add line's sheet info only to the relevant board type
+			//If they are not unique, add line's sheet info only to the relevant board type
 			else
 			{
 				std::vector<std::string> vParserS1;
